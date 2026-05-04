@@ -1,0 +1,65 @@
+/* LinkedAI - Injected styles for LinkedIn */
+
+.linkedai-float-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 9999;
+  background: #0a0a0f;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+  opacity: 0.85;
+}
+
+.linkedai-float-btn:hover {
+  background: #0a66c2;
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(10,102,194,0.35);
+}
+
+.linkedai-float-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.linkedai-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+#linkedai-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a0a0f;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  z-index: 99999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  white-space: nowrap;
+  animation: toastIn 0.3s ease;
+  pointer-events: none;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
