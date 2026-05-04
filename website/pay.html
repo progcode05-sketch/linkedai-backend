@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedAI — Complete your subscription</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #0A66C2;
+      --ink: #0a0a0b;
+      --ink-2: #2c2d33;
+      --ink-4: #8c8d96;
+      --bg: #f5f6f9;
+      --surface: #ffffff;
+      --line: #e4e6ec;
+      --shadow: 0 8px 32px rgba(18,20,30,.10);
+    }
+    body {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 24px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 48px 44px;
+      width: 100%; max-width: 400px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .logo {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 22px; color: var(--ink); margin-bottom: 32px;
+      letter-spacing: -.3px;
+    }
+    .logo b { color: var(--blue); font-weight: 400; }
+
+    .plan-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #e8f0fb; color: var(--blue);
+      font-size: 12px; font-weight: 600; letter-spacing: .5px;
+      text-transform: uppercase;
+      padding: 5px 12px; border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 26px; font-weight: 400;
+      letter-spacing: -.5px; color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px; color: var(--ink-4); line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .spinner-wrap {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #e8f0fb;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(10,102,194,.2);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 100%; height: 48px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: background .15s, transform .15s;
+      margin-top: 8px;
+    }
+    .btn:hover { background: #0856a8; transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent; color: var(--ink-4);
+      border: 1px solid var(--line);
+      margin-top: 12px;
+      font-size: 14px; font-weight: 500;
+    }
+    .btn-ghost:hover { background: var(--bg); color: var(--ink-2); transform: none; }
+
+    .error-box {
+      background: #fdecef; border: 1px solid #fbd9de;
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 13px; color: #991b1b;
+      margin-bottom: 20px; text-align: left; line-height: 1.5;
+    }
+    .features {
+      text-align: left; margin-bottom: 28px;
+    }
+    .feature {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13.5px; color: var(--ink-2);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .feature:last-child { border-bottom: none; }
+    .feature-icon {
+      width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+      color: var(--blue);
+    }
+    .price-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg); border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 24px;
+      font-size: 14px; color: var(--ink-2);
+    }
+    .price-row strong { font-size: 18px; color: var(--ink); font-weight: 600; }
+    #loadingView, #payView, #errorView { display: none; }
+    #loadingView.active, #payView.active, #errorView.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Linked<b>AI</b></div>
+
+  <!-- Loading state -->
+  <div id="loadingView" class="active">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+    <h2>Opening payment…</h2>
+    <p class="subtitle">Loading Razorpay checkout.<br>This only takes a moment.</p>
+  </div>
+
+  <!-- Pay view (shown if Razorpay blocked) -->
+  <div id="payView">
+    <div id="planBadge" class="plan-badge">Pro Plan</div>
+    <h2>Complete your upgrade</h2>
+    <p class="subtitle">Click below to open the secure payment window.</p>
+    <div id="priceRow" class="price-row">
+      <span>Monthly subscription</span>
+      <strong id="priceLabel">₹999/mo</strong>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <svg class="feature-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        AI-powered reply generation
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Smart connection messages
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Unlimited generations
+      </div>
+    </div>
+    <button class="btn" id="btnPay" onclick="openRazorpay()">Pay securely →</button>
+    <a href="/" class="btn btn-ghost">Cancel</a>
+  </div>
+
+  <!-- Error state -->
+  <div id="errorView">
+    <div class="error-box" id="errorMsg">Something went wrong.</div>
+    <a href="/" class="btn btn-ghost">Back to home</a>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const PLAN_PRICES = { pro: '₹999/mo', max: '₹1,999/mo' };
+  const PLAN_LABELS = { pro: 'Pro Plan', max: 'Max Plan' };
+
+  const params      = new URLSearchParams(window.location.search);
+  const subscriptionId = params.get('sub');
+  const keyId          = params.get('key');
+  const plan           = params.get('plan') || 'pro';
+  const name           = decodeURIComponent(params.get('name') || '');
+  const email          = decodeURIComponent(params.get('email') || '');
+  const token          = params.get('token') || '';
+
+  function show(id) {
+    ['loadingView','payView','errorView'].forEach(v => {
+      document.getElementById(v).classList.toggle('active', v === id);
+    });
+  }
+
+  function showError(msg) {
+    document.getElementById('errorMsg').textContent = msg;
+    show('errorView');
+  }
+
+  function openRazorpay() {
+    if (!subscriptionId || !keyId) {
+      showError('Missing payment details. Please go back and try again.');
+      return;
+    }
+
+    const rzp = new Razorpay({
+      key: keyId,
+      subscription_id: subscriptionId,
+      name: 'LinkedAI',
+      description: PLAN_LABELS[plan] || 'Subscription',
+      prefill: { name, email },
+      theme: { color: '#0A66C2' },
+      handler: function(response) {
+        window.location.href =
+          '/?payment=success&plan=' + encodeURIComponent(plan) +
+          '&token=' + encodeURIComponent(token);
+      },
+      modal: {
+        ondismiss: function() { show('payView'); }
+      }
+    });
+
+    rzp.on('payment.failed', function(response) {
+      showError('Payment failed: ' + (response.error?.description || 'Please try again.'));
+    });
+
+    rzp.open();
+  }
+
+  // Auto-open Razorpay on load
+  window.addEventListener('load', () => {
+    if (!subscriptionId || !keyId) {
+      showError('Invalid payment link. Please go back and try again.');
+      return;
+    }
+
+    // Update plan UI
+    document.getElementById('planBadge').textContent = PLAN_LABELS[plan] || 'Pro Plan';
+    document.getElementById('priceLabel').textContent = PLAN_PRICES[plan] || '₹999/mo';
+
+    // Give Razorpay script time to load, then auto-open
+    setTimeout(() => {
+      if (typeof Razorpay === 'undefined') {
+        show('payView'); // fallback: show manual button
+        return;
+      }
+      show('payView'); // show card behind the modal
+      openRazorpay();
+    }, 800);
+  });
+</script>
+</body>
+</html>

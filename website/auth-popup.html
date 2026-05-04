@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedAI — Signing in…</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: #f5f6f9;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e4e6ec;
+      border-radius: 20px;
+      padding: 44px 40px;
+      width: 100%; max-width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(18,20,30,.10);
+    }
+    .logo {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 22px; color: #0a0a0b; margin-bottom: 24px;
+    }
+    .logo b { color: #0A66C2; font-weight: 400; }
+    .spinner-wrap {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: #e8f0fb;
+      display: flex; align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .spinner {
+      width: 24px; height: 24px;
+      border: 2.5px solid rgba(10,102,194,.2);
+      border-top-color: #0A66C2;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 22px; font-weight: 400;
+      letter-spacing: -.4px; color: #0a0a0b;
+      margin-bottom: 8px;
+    }
+    p { font-size: 14px; color: #5b5c63; line-height: 1.6; }
+    .error-box {
+      background: #fdecef; border: 1px solid #fbd9de;
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 13px; color: #991b1b;
+      margin-top: 20px; display: none; text-align: left;
+    }
+    .error-box.show { display: block; }
+    .btn-retry {
+      display: inline-flex; align-items: center;
+      margin-top: 16px; padding: 0 18px; height: 40px;
+      background: #0A66C2; color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: background .15s;
+    }
+    .btn-retry:hover { background: #0856a8; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Linked<b>AI</b></div>
+
+  <div id="loadingView">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+    <h2>Signing you in…</h2>
+    <p>Completing LinkedIn authentication.<br>This window will close automatically.</p>
+  </div>
+
+  <div id="errorView" style="display:none">
+    <div class="spinner-wrap" style="background:#fdecef">
+      <span style="font-size:22px">✕</span>
+    </div>
+    <h2>Sign-in failed</h2>
+    <p id="errorMsg">Something went wrong. Please try again.</p>
+    <a href="javascript:window.close()" class="btn-retry">Close and try again</a>
+  </div>
+</div>
+
+<script>
+  const BACKEND = 'https://linkedai-backend-three.vercel.app';
+
+  function showError(msg) {
+    document.getElementById('loadingView').style.display = 'none';
+    document.getElementById('errorView').style.display  = '';
+    document.getElementById('errorMsg').textContent = msg;
+  }
+
+  async function handleCallback() {
+    const params        = new URLSearchParams(window.location.search);
+    const code          = params.get('code');
+    const returnedState = params.get('state');
+    const errorParam    = params.get('error');
+
+    if (errorParam) {
+      showError('LinkedIn sign-in was cancelled or denied.');
+      if (window.opener) window.opener.postMessage({ type: 'linkedai-auth', error: 'Cancelled.' }, '*');
+      return;
+    }
+
+    if (!code) {
+      showError('No authorization code received from LinkedIn.');
+      return;
+    }
+
+    // CSRF state check
+    const savedState = sessionStorage.getItem('li_state');
+    if (savedState && returnedState !== savedState) {
+      showError('State mismatch — possible CSRF. Please try again.');
+      return;
+    }
+
+    try {
+      const redirectUri = window.location.origin + '/auth-popup.html';
+      const res = await fetch(`${BACKEND}/api/auth/linkedin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirectUri })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+      // Send token back to parent window
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          { type: 'linkedai-auth', token: data.token, user: data.user },
+          window.location.origin
+        );
+        window.close();
+      } else {
+        // Popup was blocked — store in sessionStorage and redirect back
+        sessionStorage.setItem('linkedai_token', JSON.stringify({ token: data.token, user: data.user }));
+        const plan = sessionStorage.getItem('pending_plan') || 'free';
+        window.location.href = '/website/index.html?auth=done&plan=' + plan;
+      }
+
+    } catch (err) {
+      showError(err.message);
+      if (window.opener) {
+        window.opener.postMessage({ type: 'linkedai-auth', error: err.message }, '*');
+      }
+    }
+  }
+
+  handleCallback();
+</script>
+</body>
+</html>

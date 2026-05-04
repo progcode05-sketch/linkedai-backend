@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedAI — Write LinkedIn content that sounds like you</title>
+  <meta name="description" content="LinkedAI generates comments, outreach messages, and replies for LinkedIn in your voice. 3 options in 3 seconds. Free to start." />
+  <meta property="og:title" content="LinkedAI — LinkedIn AI Assistant" />
+  <meta property="og:description" content="Comments, outreach, and replies — generated in your voice. Powered by Makersmanlab." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS (Noxlin palette) ─────────────────────────── */
+    :root {
+      --blue:          #0A66C2;
+      --blue-dark:     #0856a8;
+      --blue-light:    #e8f0fb;
+      --blue-ring:     rgba(10,102,194,.18);
+
+      --ink:           #0a0a0b;
+      --ink-2:         #26262a;
+      --ink-3:         #5b5c63;
+      --ink-4:         #8e8f96;
+
+      --surface:       #ffffff;
+      --surface-2:     #f7f7f9;
+      --surface-3:     #eceef2;
+      --bg:            #f5f6f9;
+
+      --line:          #e4e6ec;
+      --line-strong:   #cfd2da;
+
+      --shadow-xs:     0 1px 2px rgba(18,20,30,.04);
+      --shadow-sm:     0 2px 8px rgba(18,20,30,.06);
+      --shadow:        0 4px 16px rgba(18,20,30,.08);
+      --shadow-md:     0 8px 32px rgba(18,20,30,.10);
+      --shadow-lg:     0 16px 48px rgba(18,20,30,.12);
+
+      --display:       'Instrument Serif', Georgia, serif;
+      --sans:          'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --r-sm:  8px;
+      --r:     12px;
+      --r-lg:  18px;
+      --r-xl:  24px;
+      --r-2xl: 32px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── ANIMATIONS ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: .08s; }
+    .d2 { transition-delay: .16s; }
+    .d3 { transition-delay: .24s; }
+    .d4 { transition-delay: .32s; }
+
+    /* ─── LAYOUT ──────────────────────────────────────────── */
+    .wrap    { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+    .wrap-sm { max-width: 700px;  margin: 0 auto; padding: 0 28px; }
+
+    /* ─── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      height: 62px;
+    }
+    .logo {
+      font-family: var(--display);
+      font-size: 22px; letter-spacing: -.2px;
+      color: var(--ink);
+    }
+    .logo b { color: var(--blue); font-weight: 400; }
+    .nav-links {
+      display: flex; gap: 30px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px; font-weight: 500;
+      color: var(--ink-3);
+      transition: color .15s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-end { display: flex; align-items: center; gap: 10px; }
+
+    /* ─── BUTTONS ─────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--sans); font-size: 14px; font-weight: 600;
+      border-radius: 10px; padding: 0 18px; height: 40px;
+      border: 1px solid transparent; cursor: pointer;
+      transition: all .18s; white-space: nowrap;
+      letter-spacing: -.01em;
+    }
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      box-shadow: 0 1px 3px rgba(10,102,194,.3);
+    }
+    .btn-primary:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 4px 18px rgba(10,102,194,.35);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--surface); color: var(--ink-2);
+      border-color: var(--line); box-shadow: var(--shadow-xs);
+    }
+    .btn-secondary:hover {
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--ink-3);
+      padding: 0 12px; height: 36px; font-size: 13px;
+    }
+    .btn-ghost:hover { color: var(--ink); }
+    .btn-lg { height: 50px; padding: 0 26px; font-size: 15px; border-radius: 12px; }
+    .btn-xl { height: 56px; padding: 0 32px; font-size: 16px; border-radius: 14px; }
+
+    /* ─── HERO ────────────────────────────────────────────── */
+    .hero {
+      padding: 100px 0 72px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-light); color: var(--blue);
+      font-size: 12.5px; font-weight: 600;
+      padding: 5px 14px; border-radius: 99px;
+      margin-bottom: 32px;
+      letter-spacing: .1px;
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--blue);
+      animation: pulseDot 2s infinite;
+    }
+    .hero-h1 {
+      font-family: var(--display);
+      font-size: clamp(46px, 7.5vw, 80px);
+      font-weight: 400;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      color: var(--ink);
+      margin-bottom: 26px;
+      max-width: 800px;
+      margin-left: auto; margin-right: auto;
+    }
+    .hero-h1 em { font-style: italic; color: var(--blue); }
+    .hero-sub {
+      font-size: 18px; color: var(--ink-3);
+      line-height: 1.65; max-width: 500px;
+      margin: 0 auto 44px;
+    }
+    .hero-actions {
+      display: flex; align-items: center;
+      justify-content: center; gap: 12px;
+      flex-wrap: wrap; margin-bottom: 52px;
+    }
+    .hero-trust {
+      display: flex; align-items: center;
+      justify-content: center; gap: 6px;
+      font-size: 13px; color: var(--ink-4);
+      flex-wrap: wrap;
+    }
+    .hero-trust-sep { color: var(--line-strong); }
+
+    /* ─── MOCKUP ──────────────────────────────────────────── */
+    .mockup-section { padding: 0 0 80px; }
+    .mockup-shell {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--r-2xl);
+      padding: 40px 40px 32px;
+      position: relative; overflow: hidden;
+    }
+    .mockup-shell::before {
+      content: '';
+      position: absolute; top: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 350px;
+      background: radial-gradient(ellipse, rgba(10,102,194,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* Extension window */
+    .ext-window {
+      max-width: 390px; margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,.02);
+      overflow: hidden;
+      font-size: 13px;
+    }
+    .ext-bar {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .ext-logo-sm {
+      font-family: var(--display);
+      font-size: 17px; color: var(--ink);
+    }
+    .ext-logo-sm b { color: var(--blue); font-weight: 400; }
+    .ext-chip {
+      font-size: 11px; color: var(--ink-4);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      padding: 3px 10px; border-radius: 99px;
+    }
+    .ext-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--line);
+    }
+    .ext-tab {
+      flex: 1; padding: 10px 0;
+      text-align: center;
+      font-size: 12px; font-weight: 500;
+      color: var(--ink-4);
+    }
+    .ext-tab.on {
+      color: var(--blue); font-weight: 600;
+      border-bottom: 2px solid var(--blue);
+    }
+    .ext-body { padding: 16px; }
+    .ext-lbl {
+      font-size: 11px; font-weight: 600;
+      color: var(--ink-3); margin-bottom: 7px;
+      letter-spacing: .3px;
+    }
+    .ext-box {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px; color: var(--ink-3);
+      line-height: 1.55; margin-bottom: 13px;
+      min-height: 60px;
+    }
+    .ext-pills {
+      display: flex; gap: 6px;
+      flex-wrap: wrap; margin-bottom: 13px;
+    }
+    .ext-pill {
+      padding: 4px 11px; border-radius: 99px;
+      font-size: 11px; font-weight: 500;
+      border: 1px solid var(--line);
+      color: var(--ink-4);
+    }
+    .ext-pill.on {
+      background: var(--blue);
+      border-color: var(--blue); color: #fff;
+    }
+    .ext-gen-btn {
+      width: 100%; height: 34px;
+      background: var(--ink); color: #fff;
+      border-radius: 8px;
+      font-size: 12.5px; font-weight: 600;
+      display: flex; align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .ext-card {
+      border: 1px solid var(--line);
+      border-radius: 8px; padding: 11px 12px;
+      margin-bottom: 7px;
+    }
+    .ext-card-text {
+      font-size: 12px; color: var(--ink-2);
+      line-height: 1.55; margin-bottom: 8px;
+    }
+    .ext-card-copy {
+      font-size: 11px; font-weight: 600;
+      color: var(--blue);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .ext-card:last-child { opacity: .5; }
+
+    /* ─── STATS ───────────────────────────────────────────── */
+    .stats {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+      padding: 36px 0; margin-bottom: 100px;
+    }
+    .stats-row {
+      display: flex; align-items: center;
+      justify-content: center;
+      gap: 72px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-n {
+      font-family: var(--display);
+      font-size: 40px; font-weight: 400;
+      color: var(--ink); line-height: 1;
+      letter-spacing: -1.5px;
+    }
+    .stat-n b { color: var(--blue); font-weight: 400; }
+    .stat-l {
+      font-size: 13px; color: var(--ink-4); margin-top: 5px;
+    }
+
+    /* ─── SECTIONS ────────────────────────────────────────── */
+    .section { padding: 96px 0; }
+    .section-bg { background: var(--bg); }
+    .section-lbl {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 14px;
+    }
+    .section-h {
+      font-family: var(--display);
+      font-size: clamp(34px, 4.5vw, 54px);
+      font-weight: 400; letter-spacing: -1.2px;
+      line-height: 1.1; color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .section-h em { font-style: italic; color: var(--blue); }
+    .section-p {
+      font-size: 17px; color: var(--ink-3);
+      line-height: 1.65; max-width: 480px;
+    }
+
+    /* ─── FEATURES ────────────────────────────────────────── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-top: 56px;
+    }
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 28px 24px;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feat-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+    }
+    .feat-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--blue-light);
+      display: flex; align-items: center;
+      justify-content: center;
+      font-size: 20px; margin-bottom: 18px;
+    }
+    .feat-title {
+      font-family: var(--display);
+      font-size: 20px; font-weight: 400;
+      letter-spacing: -.3px; color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .feat-desc {
+      font-size: 14px; color: var(--ink-3);
+      line-height: 1.65;
+    }
+
+    /* ─── STEPS ───────────────────────────────────────────── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0; margin-top: 64px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 21px;
+      left: calc(16.67% + 21px);
+      right: calc(16.67% + 21px);
+      height: 1px; background: var(--line);
+    }
+    .step {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 0 28px;
+    }
+    .step-num {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      font-weight: 700; font-size: 15px;
+      display: flex; align-items: center;
+      justify-content: center;
+      margin-bottom: 22px; position: relative; z-index: 1;
+      box-shadow: 0 0 0 7px var(--surface);
+    }
+    .step-title {
+      font-family: var(--display);
+      font-size: 20px; color: var(--ink);
+      letter-spacing: -.3px; margin-bottom: 10px;
+    }
+    .step-desc { font-size: 14px; color: var(--ink-3); line-height: 1.65; }
+
+    /* ─── PRICING ─────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-top: 56px;
+      align-items: start;
+    }
+    .plan {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 28px 24px;
+      transition: box-shadow .2s;
+      position: relative;
+    }
+    .plan.star {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue), var(--shadow-sm);
+    }
+    .plan-badge {
+      position: absolute; top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue); color: #fff;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .5px;
+      padding: 4px 14px; border-radius: 99px;
+    }
+    .plan-name {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--ink-4); margin-bottom: 10px;
+    }
+    .plan-price {
+      display: flex; align-items: flex-end;
+      gap: 4px; margin-bottom: 6px;
+    }
+    .plan-amount {
+      font-family: var(--display);
+      font-size: 52px; line-height: 1;
+      letter-spacing: -2px; color: var(--ink);
+    }
+    .plan-period {
+      font-size: 14px; color: var(--ink-4);
+      margin-bottom: 8px;
+    }
+    .plan-tagline {
+      font-size: 13px; color: var(--ink-3);
+      margin-bottom: 24px; line-height: 1.5;
+    }
+    .plan-list {
+      list-style: none;
+      display: flex; flex-direction: column;
+      gap: 11px; margin-bottom: 24px;
+    }
+    .plan-item {
+      display: flex; align-items: flex-start;
+      gap: 10px; font-size: 13.5px; color: var(--ink-2);
+    }
+    .check {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--blue-light);
+      display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .check svg { color: var(--blue); }
+
+    /* ─── TESTIMONIALS ────────────────────────────────────── */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-top: 56px;
+    }
+    .testi-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      padding: 28px 24px;
+    }
+    .testi-stars {
+      display: flex; gap: 3px; margin-bottom: 14px;
+      color: #f59e0b;
+    }
+    .testi-quote {
+      font-family: var(--display);
+      font-size: 17px; font-weight: 400;
+      font-style: italic;
+      color: var(--ink-2); line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .testi-author {
+      display: flex; align-items: center; gap: 11px;
+    }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue-light);
+      display: flex; align-items: center;
+      justify-content: center;
+      font-size: 14px; font-weight: 700;
+      color: var(--blue); flex-shrink: 0;
+    }
+    .testi-name {
+      font-size: 13px; font-weight: 600; color: var(--ink);
+    }
+    .testi-role { font-size: 12px; color: var(--ink-4); }
+
+    /* ─── FAQ ─────────────────────────────────────────────── */
+    .faq-list {
+      margin-top: 56px;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--surface); overflow: hidden;
+    }
+    .faq-q {
+      width: 100%; padding: 20px 24px;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      font-family: var(--sans);
+      font-size: 15px; font-weight: 600;
+      color: var(--ink); cursor: pointer;
+      text-align: left; background: none;
+      border: none; transition: color .15s;
+    }
+    .faq-q:hover { color: var(--blue); }
+    .faq-icon {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: var(--surface-2);
+      display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+      font-size: 18px; line-height: 1;
+      transition: transform .25s, background .2s, color .2s;
+      color: var(--ink-3);
+    }
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      background: var(--blue-light); color: var(--blue);
+    }
+    .faq-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height .35s ease;
+    }
+    .faq-item.open .faq-body { max-height: 260px; }
+    .faq-inner {
+      padding: 0 24px 22px;
+      font-size: 14.5px; color: var(--ink-3); line-height: 1.7;
+    }
+
+    /* ─── BOTTOM CTA ──────────────────────────────────────── */
+    .cta-section { padding: 100px 0; }
+    .cta-card {
+      background: var(--ink);
+      border-radius: var(--r-2xl);
+      padding: 80px 48px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-card::before {
+      content: '';
+      position: absolute; top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(10,102,194,.45) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cta-h {
+      font-family: var(--display);
+      font-size: clamp(38px, 5.5vw, 64px);
+      font-weight: 400; color: #fff;
+      letter-spacing: -1.5px; line-height: 1.07;
+      margin-bottom: 20px; position: relative; z-index: 1;
+    }
+    .cta-h em { font-style: italic; color: rgba(255,255,255,.55); }
+    .cta-sub {
+      font-size: 16px; color: rgba(255,255,255,.45);
+      margin-bottom: 40px; position: relative; z-index: 1;
+    }
+    .cta-btns {
+      display: flex; align-items: center;
+      justify-content: center; gap: 12px;
+      flex-wrap: wrap; position: relative; z-index: 1;
+    }
+    .btn-white {
+      background: #fff; color: var(--ink);
+    }
+    .btn-white:hover {
+      background: rgba(255,255,255,.9);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(255,255,255,.15);
+    }
+    .btn-dim {
+      background: transparent;
+      color: rgba(255,255,255,.55);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .btn-dim:hover {
+      color: rgba(255,255,255,.85);
+      border-color: rgba(255,255,255,.35);
+    }
+
+    /* ─── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 40px 0;
+    }
+    .foot-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .foot-logo {
+      font-family: var(--display); font-size: 20px;
+      color: var(--ink);
+    }
+    .foot-logo b { color: var(--blue); font-weight: 400; }
+    .foot-links {
+      display: flex; gap: 24px; list-style: none;
+    }
+    .foot-links a {
+      font-size: 13px; color: var(--ink-4);
+      transition: color .15s;
+    }
+    .foot-links a:hover { color: var(--ink); }
+    .foot-copy { font-size: 12px; color: var(--ink-4); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .feat-grid { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
+    }
+    @media (max-width: 640px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; gap: 44px; }
+      .steps-grid::before { display: none; }
+      .stats-row { gap: 36px; }
+      .cta-card { padding: 52px 24px; }
+      .foot-row { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ─── AUTH MODAL ──────────────────────────────────────── */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(10,10,11,.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex; align-items: center;
+      justify-content: center; padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .auth-overlay.open {
+      opacity: 1; pointer-events: all;
+    }
+    .auth-box {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      padding: 40px 36px 32px;
+      width: 100%; max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      transform: translateY(16px) scale(.97);
+      transition: transform .25s ease;
+    }
+    .auth-overlay.open .auth-box {
+      transform: translateY(0) scale(1);
+    }
+    .auth-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--surface-2); border: none;
+      cursor: pointer; font-size: 18px; color: var(--ink-3);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+    }
+    .auth-close:hover { background: var(--surface-3); color: var(--ink); }
+    .auth-logo {
+      font-family: var(--display); font-size: 20px;
+      color: var(--ink); margin-bottom: 20px;
+    }
+    .auth-logo b { color: var(--blue); font-weight: 400; }
+    .auth-plan-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--blue-light); color: var(--blue);
+      font-size: 12px; font-weight: 600;
+      padding: 4px 12px; border-radius: 99px;
+      margin-bottom: 18px;
+    }
+    .auth-h {
+      font-family: var(--display);
+      font-size: 28px; font-weight: 400;
+      letter-spacing: -.8px; color: var(--ink);
+      line-height: 1.15; margin-bottom: 8px;
+    }
+    .auth-sub {
+      font-size: 14px; color: var(--ink-3);
+      line-height: 1.6; margin-bottom: 28px;
+    }
+    .auth-btns {
+      display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-auth {
+      width: 100%; height: 48px;
+      display: flex; align-items: center;
+      justify-content: center; gap: 11px;
+      border-radius: 12px; font-family: var(--sans);
+      font-size: 14.5px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all .18s; letter-spacing: -.01em;
+    }
+    .btn-auth-li {
+      background: var(--blue); color: #fff;
+      box-shadow: 0 1px 3px rgba(10,102,194,.3);
+    }
+    .btn-auth-li:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 4px 16px rgba(10,102,194,.35);
+      transform: translateY(-1px);
+    }
+    .btn-auth-li:disabled {
+      opacity: .6; cursor: not-allowed; transform: none;
+    }
+    .auth-error {
+      background: #fdecef; border: 1px solid #fbd9de;
+      border-radius: 10px; padding: 11px 14px;
+      font-size: 13px; color: #991b1b;
+      margin-bottom: 14px; display: none;
+    }
+    .auth-error.show { display: block; }
+    .auth-footer {
+      font-size: 12px; color: var(--ink-4);
+      text-align: center; line-height: 1.6;
+    }
+    .auth-footer a { color: var(--blue); }
+    .auth-spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+    .auth-success {
+      text-align: center; padding: 20px 0 8px;
+    }
+    .auth-success-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #e5f6ec; margin: 0 auto 14px;
+      display: flex; align-items: center;
+      justify-content: center; font-size: 24px;
+    }
+    .auth-success-h {
+      font-family: var(--display);
+      font-size: 22px; color: var(--ink);
+      margin-bottom: 8px; letter-spacing: -.4px;
+    }
+    .auth-success-p {
+      font-size: 14px; color: var(--ink-3);
+      line-height: 1.65; margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Profile form (inside auth modal) ────────────────────── */
+    .auth-box.profile-mode {
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .profile-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .profile-grid .full { grid-column: 1 / -1; }
+    .pf-field { display: flex; flex-direction: column; gap: 6px; }
+    .pf-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-2); letter-spacing: .2px;
+    }
+    .pf-input, .pf-textarea {
+      width: 100%; border: 1.5px solid var(--line);
+      border-radius: 10px; padding: 11px 13px;
+      font-family: var(--sans); font-size: 14px; color: var(--ink);
+      background: var(--surface); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    .pf-input::placeholder, .pf-textarea::placeholder { color: var(--ink-4); }
+    .pf-input:focus, .pf-textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(10,102,194,.08);
+    }
+    .pf-textarea { resize: none; line-height: 1.55; min-height: 82px; }
+    .pf-hint { font-size: 11px; color: var(--ink-4); line-height: 1.5; margin-top: -3px; }
+    .tone-label {
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-2); margin-bottom: 8px;
+    }
+    .tone-pills { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tone-pill {
+      padding: 6px 14px; border-radius: 24px;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      border: 1.5px solid var(--line); background: var(--surface);
+      color: var(--ink-3); transition: all .15s; user-select: none;
+    }
+    .tone-pill:hover { border-color: var(--blue); color: var(--blue); }
+    .tone-pill.active {
+      background: var(--blue); border-color: var(--blue); color: #fff;
+    }
+    .pf-divider {
+      height: 1px; background: var(--line); margin: 20px 0;
+    }
+    .pf-connect-title {
+      font-family: var(--display); font-size: 20px;
+      color: var(--ink); letter-spacing: -.4px;
+      margin-bottom: 6px;
+    }
+    .pf-connect-sub {
+      font-size: 13px; color: var(--ink-3);
+      line-height: 1.6; margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════ -->
+<nav>
+  <div class="wrap">
+    <div class="nav-row">
+      <a href="/" class="logo">Linked<b>AI</b></a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-end">
+        <a href="#pricing" class="btn btn-ghost">Pricing</a>
+        <a href="javascript:void(0)" onclick="openAuthModal('free')" class="btn btn-ghost">Sign in</a>
+        <a href="javascript:void(0)" onclick="addToChrome()" class="btn btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Add to Chrome — free
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="wrap-sm">
+
+    <div class="badge reveal">
+      <div class="badge-dot"></div>
+      Chrome Extension &nbsp;·&nbsp; Powered by Makermanlab
+    </div>
+
+    <h1 class="hero-h1 reveal d1">
+      Write LinkedIn content<br>that sounds like <em>you.</em>
+    </h1>
+
+    <p class="hero-sub reveal d2">
+      LinkedAI generates comments, outreach messages, and replies in your voice — not generic AI output. Three options in three seconds.
+    </p>
+
+    <div class="hero-actions reveal d3">
+      <a href="javascript:void(0)" onclick="addToChrome()" class="btn btn-primary btn-xl" id="install">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Add to Chrome — it's free
+      </a>
+      <a href="#features" class="btn btn-secondary btn-xl">See how it works →</a>
+    </div>
+
+    <div class="hero-trust reveal d4">
+      <span>✓&nbsp; 10 free generations / month</span>
+      <span class="hero-trust-sep">·</span>
+      <span>✓&nbsp; No credit card</span>
+      <span class="hero-trust-sep">·</span>
+      <span>✓&nbsp; Works inline on LinkedIn</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ EXTENSION MOCKUP ══════════════════════════════════════ -->
+<section class="mockup-section">
+  <div class="wrap">
+    <div class="mockup-shell reveal">
+      <div class="ext-window">
+
+        <div class="ext-bar">
+          <div class="ext-logo-sm">Linked<b>AI</b></div>
+          <div class="ext-chip">3 / 10 used</div>
+        </div>
+
+        <div class="ext-tabs">
+          <div class="ext-tab on">Comment</div>
+          <div class="ext-tab">Outreach</div>
+          <div class="ext-tab">Reply</div>
+          <div class="ext-tab">Account</div>
+        </div>
+
+        <div class="ext-body">
+          <div class="ext-lbl">Post Content</div>
+          <div class="ext-box">After 6 months of building in stealth, we just launched publicly today. The journey was intense — here's what I learned about shipping when you're not ready...</div>
+
+          <div class="ext-lbl">Tone</div>
+          <div class="ext-pills">
+            <div class="ext-pill on">🧠 Thoughtful</div>
+            <div class="ext-pill">✨ Engaging</div>
+            <div class="ext-pill">😄 Witty</div>
+            <div class="ext-pill">💼 Professional</div>
+          </div>
+
+          <div class="ext-gen-btn">Generate Comments</div>
+
+          <div class="ext-card">
+            <div class="ext-card-text">Six months of stealth and then the world weighs in all at once. That tension between protecting the idea and needing real feedback is one of the hardest calls in early-stage building. Congrats on shipping.</div>
+            <div class="ext-card-copy">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </div>
+          </div>
+
+          <div class="ext-card">
+            <div class="ext-card-text">The stealth-to-public jump is brutal. You lose full control of the narrative overnight. Six months of discipline — that's worth celebrating on its own terms.</div>
+            <div class="ext-card-copy">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ══════════════════════════════════════════════════ -->
+<div class="stats">
+  <div class="wrap">
+    <div class="stats-row">
+      <div class="stat reveal">
+        <div class="stat-n"><b>3</b> sec</div>
+        <div class="stat-l">average generation time</div>
+      </div>
+      <div class="stat reveal d1">
+        <div class="stat-n"><b>3</b> options</div>
+        <div class="stat-l">every single time</div>
+      </div>
+      <div class="stat reveal d2">
+        <div class="stat-n"><b>5</b> tones</div>
+        <div class="stat-l">to match your voice</div>
+      </div>
+      <div class="stat reveal d3">
+        <div class="stat-n"><b>$0</b></div>
+        <div class="stat-l">to get started</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════ -->
+<section class="section section-bg" id="features">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="section-lbl">Features</div>
+      <h2 class="section-h">Everything you need to<br>engage on LinkedIn.</h2>
+      <p class="section-p">Three tools in one extension. Works from the popup or directly inside LinkedIn's comment boxes.</p>
+    </div>
+
+    <div class="feat-grid">
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon">💬</div>
+        <div class="feat-title">Comment Generator</div>
+        <p class="feat-desc">Paste any LinkedIn post and get 3 tone-matched comments that add real value — not empty "Great post!" replies that get ignored.</p>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon">✉️</div>
+        <div class="feat-title">Outreach Drafter</div>
+        <p class="feat-desc">Cold DMs, connection requests, follow-ups, collaboration pitches — personalized to the person you're reaching out to.</p>
+      </div>
+
+      <div class="feat-card reveal d3">
+        <div class="feat-icon">↩️</div>
+        <div class="feat-title">Reply Generator</div>
+        <p class="feat-desc">Someone messaged you — craft a reply that hits the right note, whether you're thanking, adding value, disagreeing, or closing.</p>
+      </div>
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon">✦</div>
+        <div class="feat-title">Inline AI Button</div>
+        <p class="feat-desc">A floating ✦ button appears inside every LinkedIn comment box. One click drafts a comment from the post — without leaving the page.</p>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">Your Voice, Not AI's</div>
+        <p class="feat-desc">Set your name, role, and bio once. Every generation adapts to sound like you — direct, warm, witty, or professional, your call.</p>
+      </div>
+
+      <div class="feat-card reveal d3">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-title">Private by Design</div>
+        <p class="feat-desc">Your posts and messages are processed and forgotten — nothing is stored after generation. Your LinkedIn password is never touched.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════ -->
+<section class="section" id="how-it-works">
+  <div class="wrap-sm">
+    <div class="reveal" style="text-align:center">
+      <div class="section-lbl">How it works</div>
+      <h2 class="section-h">Up and running<br>in <em>two minutes.</em></h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step reveal d1">
+        <div class="step-num">1</div>
+        <div class="step-title">Install & sign in</div>
+        <p class="step-desc">Add LinkedAI to Chrome. Create your free account with LinkedIn — no separate password, just OAuth. Takes 30 seconds.</p>
+      </div>
+      <div class="step reveal d2">
+        <div class="step-num">2</div>
+        <div class="step-title">Set your profile</div>
+        <p class="step-desc">Tell us your name, role, and a bit about your style. This is what makes the output sound like you instead of a robot.</p>
+      </div>
+      <div class="step reveal d3">
+        <div class="step-num">3</div>
+        <div class="step-title">Generate & copy</div>
+        <p class="step-desc">Paste a post, pick a tone, hit Generate. Choose the best of 3 options, copy it, and post on LinkedIn. Done.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══════════════════════════════════════════ -->
+<section class="section section-bg">
+  <div class="wrap">
+    <div class="reveal" style="text-align:center">
+      <div class="section-lbl">Early users</div>
+      <h2 class="section-h">What people are saying.</h2>
+    </div>
+
+    <div class="testi-grid">
+
+      <div class="testi-card reveal d1">
+        <div class="testi-stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-quote">"I've tried five LinkedIn AI tools. LinkedAI is the only one where I don't have to rewrite the output before posting. It actually sounds like me."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">R</div>
+          <div>
+            <div class="testi-name">Rahul M.</div>
+            <div class="testi-role">SaaS Founder</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal d2">
+        <div class="testi-stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-quote">"The inline button is game-changing. I'm on LinkedIn, I see a post I want to comment on, one click and I have three solid options right there."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">P</div>
+          <div>
+            <div class="testi-name">Priya K.</div>
+            <div class="testi-role">Growth Lead, B2B SaaS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card reveal d3">
+        <div class="testi-stars">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="testi-quote">"I do 20–30 cold DMs a week. LinkedAI cut my writing time in half and the reply rate went up. I didn't expect both to happen at once."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div>
+            <div class="testi-name">Arjun S.</div>
+            <div class="testi-role">Sales, Enterprise SaaS</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ════════════════════════════════════════════════ -->
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="reveal" style="text-align:center">
+      <div class="section-lbl">Pricing</div>
+      <h2 class="section-h">Simple, honest pricing.</h2>
+      <p class="section-p" style="margin:0 auto">Start free. Upgrade when you need more. Cancel any time, no friction.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="plan reveal d1">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">
+          <div class="plan-amount">$0</div>
+        </div>
+        <div class="plan-tagline">Forever free. No card needed.</div>
+        <ul class="plan-list">
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            10 generations / month
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Comments, outreach & replies
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Inline ✦ AI button
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Writing profile
+          </li>
+        </ul>
+        <a href="javascript:void(0)" onclick="addToChrome()" class="btn btn-secondary" style="width:100%;justify-content:center">Get started free</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="plan star reveal d2">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">
+          <div class="plan-amount">$9</div>
+          <div class="plan-period">/ month</div>
+        </div>
+        <div class="plan-tagline">For active LinkedIn builders.</div>
+        <ul class="plan-list">
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            250 generations / month
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Everything in Free
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Priority generation speed
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Email support
+          </li>
+        </ul>
+        <button onclick="openAuthModal('pro')" class="btn btn-primary" style="width:100%;justify-content:center">Start with Pro</button>
+      </div>
+
+      <!-- Max -->
+      <div class="plan reveal d3">
+        <div class="plan-name">Max</div>
+        <div class="plan-price">
+          <div class="plan-amount">$20</div>
+          <div class="plan-period">/ month</div>
+        </div>
+        <div class="plan-tagline">For power users who never want to think about limits.</div>
+        <ul class="plan-list">
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Unlimited generations
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Everything in Pro
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Fastest response time
+          </li>
+          <li class="plan-item">
+            <div class="check"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            Priority support
+          </li>
+        </ul>
+        <button onclick="openAuthModal('max')" class="btn btn-secondary" style="width:100%;justify-content:center">Go unlimited</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════ -->
+<section class="section section-bg" id="faq">
+  <div class="wrap-sm">
+    <div class="reveal" style="text-align:center">
+      <div class="section-lbl">FAQ</div>
+      <h2 class="section-h">Common questions.</h2>
+    </div>
+
+    <div class="faq-list">
+
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="faq(this)">
+          Does it work on any LinkedIn post?
+          <div class="faq-icon">+</div>
+        </button>
+        <div class="faq-body">
+          <div class="faq-inner">Yes — from the popup you can paste any post or message, or use the inline ✦ AI button that appears directly inside LinkedIn comment boxes as you browse the feed. Both paths give you 3 options to choose from.</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal d1">
+        <button class="faq-q" onclick="faq(this)">
+          Will it sound like generic AI?
+          <div class="faq-icon">+</div>
+        </button>
+        <div class="faq-body">
+          <div class="faq-inner">No — that's the point. During setup you tell LinkedAI your name, role, and a short description of how you write. Every generation uses that profile to match your voice. It won't be perfect every time, but it won't sound like a press release either.</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal d2">
+        <button class="faq-q" onclick="faq(this)">
+          Is my LinkedIn data safe?
+          <div class="faq-icon">+</div>
+        </button>
+        <div class="faq-body">
+          <div class="faq-inner">Your LinkedIn password is never accessed or stored. LinkedAI uses LinkedIn's official OAuth flow (the same "Continue with LinkedIn" button you see on other apps). Content you submit for generation is processed and not stored afterward. We only keep your email, name, and usage count.</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal d3">
+        <button class="faq-q" onclick="faq(this)">
+          What's the difference between plans?
+          <div class="faq-icon">+</div>
+        </button>
+        <div class="faq-body">
+          <div class="faq-inner">Mostly generation volume — Free gets 10/month, Pro gets 250, Max is unlimited. All plans include all three tools (comments, outreach, replies) and the inline button. Upgrade when you run out. Billing is monthly and you can cancel directly from the extension, no emails required.</div>
+        </div>
+      </div>
+
+      <div class="faq-item reveal d4">
+        <button class="faq-q" onclick="faq(this)">
+          Can I cancel anytime?
+          <div class="faq-icon">+</div>
+        </button>
+        <div class="faq-body">
+          <div class="faq-inner">Yes. Cancel from the Account tab inside the extension. You keep access until the end of the billing period. No "talk to a human to cancel" flow — just one button.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOTTOM CTA ═════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <h2 class="cta-h">Start writing LinkedIn content<br>that actually <em>lands.</em></h2>
+      <p class="cta-sub">Free to start. No credit card. Works in 2 minutes.</p>
+      <div class="cta-btns">
+        <a href="javascript:void(0)" onclick="addToChrome()" class="btn btn-white btn-xl">
+          Add to Chrome — free →
+        </a>
+        <a href="mailto:progcode03@gmail.com" class="btn btn-dim btn-xl">
+          Talk to us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="foot-logo">Linked<b>AI</b></div>
+      <ul class="foot-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="../privacy.html" target="_blank">Privacy</a></li>
+        <li><a href="mailto:progcode03@gmail.com">Support</a></li>
+      </ul>
+      <div class="foot-copy">© 2026 LinkedAI &nbsp;·&nbsp; Powered by Makermanlab</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ AUTH MODAL ═════════════════════════════════════════════ -->
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-box" id="authBox">
+    <button class="auth-close" onclick="closeAuthModal()" aria-label="Close">×</button>
+
+    <!-- Default: sign-in view -->
+    <div id="authSignIn">
+      <div class="auth-logo">Linked<b>AI</b></div>
+      <div class="auth-plan-pill" id="authPlanPill">✦ Free Plan</div>
+      <h2 class="auth-h">Create your account</h2>
+      <p class="auth-sub">Sign in to activate your plan. Takes 30 seconds.</p>
+
+      <div class="auth-error" id="authError"></div>
+
+      <div class="auth-btns">
+        <button class="btn-auth btn-auth-li" id="btnLinkedIn" onclick="signInLinkedIn()">
+          <span id="liSpinner" class="auth-spinner"></span>
+          <svg id="liIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <span id="liLabel">Continue with LinkedIn</span>
+        </button>
+      </div>
+
+      <p class="auth-footer">
+        By signing in you agree to our <a href="../privacy.html" target="_blank">Privacy Policy</a>.
+      </p>
+    </div>
+
+    <!-- Profile form (shown after LinkedIn auth) -->
+    <div id="authProfile" style="display:none">
+      <div class="auth-logo">Linked<b>AI</b></div>
+      <h2 class="auth-h" style="font-size:22px;margin-bottom:6px">Your writing profile</h2>
+      <p class="auth-sub" style="margin-bottom:20px">Help LinkedAI write in your voice, not a generic AI voice.</p>
+
+      <div class="profile-grid">
+        <div class="pf-field">
+          <label class="pf-label">Your name</label>
+          <input class="pf-input" id="pfName" type="text" placeholder="e.g. Rahul Sharma" />
+        </div>
+        <div class="pf-field">
+          <label class="pf-label">Your role / title</label>
+          <input class="pf-input" id="pfRole" type="text" placeholder="e.g. SaaS Founder" />
+        </div>
+        <div class="pf-field full">
+          <label class="pf-label">What you do (in your own words)</label>
+          <textarea class="pf-textarea" id="pfBio" placeholder="e.g. I build B2B tools for sales teams. I post about growth, outbound, and founder lessons. I want my LinkedIn presence to be thoughtful and direct — not salesy."></textarea>
+          <div class="pf-hint">This is used to personalise every comment and message we generate.</div>
+        </div>
+      </div>
+
+      <div class="tone-label">Your default tone</div>
+      <div class="tone-pills" id="pfTonePills">
+        <div class="tone-pill active" data-tone="Thoughtful">🧠 Thoughtful</div>
+        <div class="tone-pill" data-tone="Direct">⚡ Direct</div>
+        <div class="tone-pill" data-tone="Warm">🤝 Warm</div>
+        <div class="tone-pill" data-tone="Witty">😄 Witty</div>
+        <div class="tone-pill" data-tone="Professional">💼 Professional</div>
+      </div>
+
+      <div class="pf-divider"></div>
+
+      <p class="pf-connect-title">Connect LinkedIn to activate</p>
+      <p class="pf-connect-sub">Sign in with LinkedIn so LinkedAI can activate your account and personalise your experience.</p>
+
+      <div class="auth-error" id="authProfileError"></div>
+
+      <div class="auth-btns">
+        <button class="btn-auth btn-auth-li" id="btnLinkedInProfile" onclick="signInLinkedIn()">
+          <span id="liSpinnerProfile" class="auth-spinner"></span>
+          <svg id="liIconProfile" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <span id="liLabelProfile">Continue with LinkedIn</span>
+        </button>
+      </div>
+      <p class="auth-footer">By continuing you agree to our <a href="../privacy.html" target="_blank">Privacy Policy</a>.</p>
+    </div>
+
+    <!-- Success view -->
+    <div id="authSuccess" style="display:none">
+      <div class="auth-success">
+        <div class="auth-success-icon">✓</div>
+        <div class="auth-success-h">You're in!</div>
+        <p class="auth-success-p">Profile saved. Now install the extension to start generating LinkedIn content in your voice.</p>
+        <a href="javascript:void(0)" onclick="addToChrome()" class="btn btn-primary btn-lg" style="width:100%;justify-content:center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Add to Chrome
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
+<script>
+  /* ── Config ───────────────────────────────────────────────── */
+  const BACKEND       = 'https://linkedai-backend-three.vercel.app';
+  const LI_CLIENT_ID  = '86dn20hkn05b0o';
+  const PAY_PAGE      = 'https://linko-ra.onrender.com/pay.html';
+  // ↓ Paste your Chrome Web Store URL here once published
+  const STORE_URL     = 'https://chrome.google.com/webstore/detail/linkedai';
+  /* ── State ────────────────────────────────────────────────── */
+  let _plan     = null;   // plan selected when modal opened
+  let _authWin  = null;   // LinkedIn popup window reference
+
+  /* ── Chrome Store helper ──────────────────────────────────── */
+  function addToChrome() {
+    window.open(STORE_URL, '_blank');
+  }
+
+  /* ── Modal open/close ─────────────────────────────────────── */
+  function showModalView(view) {
+    // view: 'signIn' | 'profile' | 'success'
+    document.getElementById('authSignIn').style.display  = view === 'signIn'  ? '' : 'none';
+    document.getElementById('authProfile').style.display = view === 'profile' ? '' : 'none';
+    document.getElementById('authSuccess').style.display = view === 'success' ? '' : 'none';
+    document.getElementById('authBox').classList.toggle('profile-mode', view === 'profile');
+  }
+
+  function openAuthModal(plan) {
+    _plan = plan;
+    setAuthError('');
+    setProfileError('');
+
+    // Update plan pill label
+    const labels = { free: '✦ Free Plan', pro: '⚡ Pro Plan', max: '🚀 Max Plan' };
+    document.getElementById('authPlanPill').textContent = labels[plan] || plan;
+
+    // Free: show LinkedIn sign-in directly. Paid: show profile first.
+    showModalView(plan === 'free' ? 'signIn' : 'profile');
+
+    document.getElementById('authOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    _plan = null;
+  }
+
+  function setProfileError(msg) {
+    const el = document.getElementById('authProfileError');
+    el.textContent = msg;
+    el.classList.toggle('show', !!msg);
+  }
+
+  /* ── Tone pill selection ──────────────────────────────────── */
+  document.getElementById('pfTonePills').addEventListener('click', (e) => {
+    const pill = e.target.closest('.tone-pill');
+    if (!pill) return;
+    document.querySelectorAll('#pfTonePills .tone-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
+
+  function getSelectedTone() {
+    const active = document.querySelector('#pfTonePills .tone-pill.active');
+    return active ? active.dataset.tone : 'Thoughtful';
+  }
+
+  function saveProfile() {
+    const profile = {
+      name: document.getElementById('pfName').value.trim(),
+      role: document.getElementById('pfRole').value.trim(),
+      bio:  document.getElementById('pfBio').value.trim(),
+      tone: getSelectedTone()
+    };
+    localStorage.setItem('linkedai_profile', JSON.stringify(profile));
+    return profile;
+  }
+
+  function setAuthError(msg) {
+    const el = document.getElementById('authError');
+    el.textContent = msg;
+    el.classList.toggle('show', !!msg);
+  }
+
+  /* ── Listen for auth result from popup ───────────────────── */
+  window.addEventListener('message', async (e) => {
+    if (e.data?.type !== 'linkedai-auth') return;
+    const { token, user, error } = e.data;
+
+    if (error) {
+      setAuthError(error);
+      setProfileError(error);
+      resetAuthBtns();
+      return;
+    }
+    if (!token) return;
+
+    resetAuthBtns();
+
+    // Save profile data (available on both flows)
+    const profile = saveProfile();
+
+    // Pre-fill name/email from LinkedIn if fields are empty
+    if (user?.name && !document.getElementById('pfName').value)
+      document.getElementById('pfName').value = user.name;
+
+    if (_plan && _plan !== 'free') {
+      await startBilling(token, user, _plan);
+    } else {
+      // Free plan — show success + install CTA
+      showModalView('success');
+    }
+  });
+
+  /* ── LinkedIn OAuth (popup) ───────────────────────────────── */
+  function signInLinkedIn() {
+    setAuthBtnLoading(true);
+    setAuthError('');
+    setProfileError('');
+
+    const state = Math.random().toString(36).slice(2);
+    sessionStorage.setItem('li_state', state);
+
+    const redirectUri = window.location.origin + '/auth-popup.html';
+    const authUrl =
+      'https://www.linkedin.com/oauth/v2/authorization' +
+      '?response_type=code' +
+      `&client_id=${LI_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      '&scope=openid%20profile%20email' +
+      `&state=${state}`;
+
+    const w = 600, h = 680;
+    const left = Math.round(screen.width  / 2 - w / 2);
+    const top  = Math.round(screen.height / 2 - h / 2);
+    _authWin = window.open(authUrl, 'linkedai_auth', `width=${w},height=${h},left=${left},top=${top}`);
+
+    // If popup was blocked fall back to redirect
+    if (!_authWin || _authWin.closed) {
+      sessionStorage.setItem('pending_plan', _plan);
+      window.location.href = authUrl;
+    }
+  }
+
+/* ── Billing ──────────────────────────────────────────────── */
+  async function startBilling(token, user, plan) {
+    try {
+      const res = await fetch(`${BACKEND}/api/billing/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ plan })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not start subscription');
+
+      const name  = encodeURIComponent(user?.name  || '');
+      const email = encodeURIComponent(user?.email || '');
+      const url   =
+        `${PAY_PAGE}?sub=${data.subscription_id}` +
+        `&key=${data.key_id}&plan=${plan}` +
+        `&name=${name}&email=${email}&token=${token}`;
+
+      window.location.href = url;
+
+    } catch (err) {
+      setAuthError(err.message);
+    }
+  }
+
+  /* ── Button loading helpers ───────────────────────────────── */
+  function setAuthBtnLoading(loading) {
+    // Update both LinkedIn buttons (sign-in view + profile view)
+    [
+      { btn: 'btnLinkedIn',        spinner: 'liSpinner',        icon: 'liIcon',        label: 'liLabel' },
+      { btn: 'btnLinkedInProfile', spinner: 'liSpinnerProfile', icon: 'liIconProfile', label: 'liLabelProfile' }
+    ].forEach(({ btn, spinner, icon, label }) => {
+      const b = document.getElementById(btn);
+      if (!b) return;
+      b.disabled = loading;
+      document.getElementById(spinner).style.display = loading ? 'block' : 'none';
+      document.getElementById(icon).style.display    = loading ? 'none'  : '';
+      document.getElementById(label).textContent     = loading ? 'Connecting…' : 'Continue with LinkedIn';
+    });
+  }
+
+  function resetAuthBtns() { setAuthBtnLoading(false); }
+
+  /* ── Scroll reveal ────────────────────────────────────────── */
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }),
+    { threshold: .12, rootMargin: '0px 0px -32px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ── FAQ accordion ────────────────────────────────────────── */
+  function faq(btn) {
+    const item = btn.closest('.faq-item');
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  }
+
+
+</script>
+</body>
+</html>
