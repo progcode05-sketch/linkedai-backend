@@ -9,7 +9,7 @@
     const btn = document.createElement('button');
     btn.className = 'linkedai-float-btn';
     btn.innerHTML = `<span>✦ AI</span>`;
-    btn.title = 'Draft with LinkedAI';
+    btn.title = 'Draft with Linkora';
 
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -18,7 +18,7 @@
       // Get session
       const { session } = await chrome.runtime.sendMessage({ type: 'GET_SESSION' });
       if (!session) {
-        showToast('Please sign in to LinkedAI first.');
+        showToast('Please sign in to Linkora first.');
         return;
       }
 
