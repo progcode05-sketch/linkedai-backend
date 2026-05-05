@@ -1,4 +1,4 @@
-# LinkedAI Backend – Deployment Guide
+# Linkora Backend – Deployment Guide
 
 ## Step 1 — Supabase Schema
 
