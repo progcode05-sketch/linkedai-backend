@@ -20,4 +20,4 @@ app.all('/api/billing/verify',    verify);
 app.all('/api/billing/webhook',   webhook);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`LinkedAI backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Linkora backend running on port ${PORT}`));
