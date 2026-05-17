@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
   try {
     const user = await verifyToken(req);
 
-    if (user.plan === 'free') {
+    if (!user.subscription_status || user.subscription_status === 'free') {
       return res.status(400).json({ error: 'Already on Free plan.' });
     }
 
@@ -39,9 +39,8 @@ module.exports = async function handler(req, res) {
     const { error } = await supabase
       .from('users')
       .update({
-        plan: 'free',
-        razorpay_subscription_id: null,
-        subscription_status: 'cancelled'
+       subscription_status: 'free',
+       razorpay_subscription_id: null
       })
       .eq('id', user.id);
 
