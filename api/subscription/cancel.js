@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
   try {
     const user = await verifyToken(req);
 
-    if (user.plan === 'free') {
+    if (!user.subscription_status || user.subscription_status === 'free') {
       return res.status(400).json({ error: 'No active subscription to cancel.' });
     }
 
