@@ -5,458 +5,409 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome to Linkora</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink: #111118;
-      --accent: #0a66c2;
-      --muted: #888;
-      --border: #e8e8e8;
-      --surface: #fafafa;
+      --blue:        #0A66C2;
+      --blue-dark:   #0856a8;
+      --blue-light:  #e8f0fb;
+      --blue-ring:   rgba(10,102,194,.18);
+      --ink:         #0a0a0b;
+      --ink-2:       #26262a;
+      --ink-3:       #5b5c63;
+      --ink-4:       #8e8f96;
+      --surface:     #ffffff;
+      --surface-2:   #f7f7f9;
+      --bg:          #f5f6f9;
+      --line:        #e4e6ec;
+      --line-strong: #cfd2da;
+      --shadow-sm:   0 2px 8px rgba(18,20,30,.06);
+      --shadow:      0 4px 16px rgba(18,20,30,.08);
+      --shadow-md:   0 8px 32px rgba(18,20,30,.10);
+      --display:     'Instrument Serif', Georgia, serif;
+      --sans:        'Inter', -apple-system, sans-serif;
+      --r:     12px;
+      --r-lg:  18px;
+      --r-xl:  24px;
     }
 
-    html, body {
-      min-height: 100vh;
-      background: #fff;
-      font-family: 'DM Sans', sans-serif;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
       color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
 
-    /* TOP BAR */
-    .topbar {
-      border-bottom: 1px solid var(--border);
-      padding: 18px 48px;
-      display: flex;
-      align-items: center;
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 40px;
+      height: 60px;
+      display: flex; align-items: center;
       justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
     }
     .logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      letter-spacing: -0.5px;
+      font-family: var(--display);
+      font-size: 22px; letter-spacing: -.2px;
       color: var(--ink);
     }
-    .logo span { color: var(--accent); }
-    .topbar-badge {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 12px;
+    .logo b { color: var(--blue); font-weight: 400; }
+    .nav-badge {
+      font-size: 12px; font-weight: 500;
+      color: var(--ink-4);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      padding: 4px 14px;
+      background: var(--surface);
     }
 
-    /* PAGE */
+    /* ── PAGE ────────────────────────────────────── */
     .page {
-      max-width: 640px;
+      max-width: 580px;
       margin: 0 auto;
-      padding: 64px 32px 80px;
+      padding: 56px 24px 80px;
     }
 
-    /* HERO */
-    .hero { margin-bottom: 52px; }
-    .hero-step {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 20px;
+    /* ── HERO ────────────────────────────────────── */
+    .hero { margin-bottom: 40px; text-align: center; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--blue-light); color: var(--blue);
+      font-size: 12px; font-weight: 600;
+      padding: 5px 14px; border-radius: 99px;
+      margin-bottom: 20px; letter-spacing: .1px;
     }
-    .hero-step::before {
-      content: '';
-      display: inline-block;
-      width: 20px; height: 1.5px;
-      background: var(--accent);
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--blue);
+      animation: pulseDot 2s infinite;
     }
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(32px, 4vw, 46px);
-      font-weight: 800;
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
+    }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 400;
       line-height: 1.1;
       letter-spacing: -1.5px;
       color: var(--ink);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    h1 em { font-style: normal; color: var(--accent); }
-    .hero-sub {
+    .hero h1 em { font-style: italic; color: var(--blue); }
+    .hero p {
       font-size: 16px;
-      color: var(--muted);
+      color: var(--ink-3);
       line-height: 1.65;
-      max-width: 480px;
+      max-width: 440px;
+      margin: 0 auto;
     }
 
-    /* SETUP CARD */
-    .setup-card {
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
+    /* ── CARD ────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
-      margin-bottom: 40px;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
     }
-    .setup-card-header {
-      padding: 24px 28px 0;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 20px;
+    .card-header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--line);
     }
-    .setup-card-header h2 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      color: var(--ink);
+    .card-header h2 {
+      font-family: var(--display);
+      font-size: 22px; font-weight: 400;
+      letter-spacing: -.4px; color: var(--ink);
       margin-bottom: 4px;
     }
-    .setup-card-header p {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .setup-card-body { padding: 28px; }
+    .card-header p { font-size: 13px; color: var(--ink-4); }
+    .card-body { padding: 28px; }
 
-    /* PROFILE FORM */
+    /* ── FORM ────────────────────────────────────── */
     .profile-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 14px; margin-bottom: 20px;
     }
     .profile-grid .full { grid-column: 1 / -1; }
-
-    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
     .field label {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: var(--ink);
-      text-transform: none;
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-2); letter-spacing: .2px;
     }
-    .field input, .field select, .field textarea {
+    .field input,
+    .field textarea {
       width: 100%;
-      border: 1.5px solid var(--border);
+      border: 1.5px solid var(--line);
       border-radius: 10px;
-      padding: 12px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      color: var(--ink);
-      background: #fff;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 11px 13px;
+      font-family: var(--sans);
+      font-size: 14px; color: var(--ink);
+      background: var(--surface);
       outline: none;
+      transition: border-color .2s, box-shadow .2s;
       -webkit-appearance: none;
     }
-    .field textarea {
-      resize: none;
-      line-height: 1.55;
-      min-height: 90px;
-    }
+    .field textarea { resize: none; line-height: 1.55; min-height: 88px; }
     .field input::placeholder,
-    .field textarea::placeholder { color: #bbb; }
+    .field textarea::placeholder { color: var(--ink-4); }
     .field input:focus,
-    .field select:focus,
     .field textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(10,102,194,0.08);
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-ring);
     }
-    .field-hint {
-      font-size: 11px;
-      color: #aaa;
-      line-height: 1.5;
-      margin-top: -3px;
-    }
+    .field-hint { font-size: 11px; color: var(--ink-4); line-height: 1.5; margin-top: -2px; }
 
-    /* TONE PILLS */
+    /* ── TONE PILLS ──────────────────────────────── */
     .tone-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ink);
-      margin-bottom: 9px;
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-2); margin-bottom: 9px;
     }
-    .tone-pills {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
+    .tone-pills { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 6px; }
     .tone-pill {
-      padding: 7px 15px;
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      transition: all 0.15s;
-      user-select: none;
+      padding: 6px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      border: 1.5px solid var(--line);
+      background: var(--surface); color: var(--ink-3);
+      transition: all .15s; user-select: none;
     }
-    .tone-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .tone-pill:hover { border-color: var(--blue); color: var(--blue); }
     .tone-pill.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
+      background: var(--blue); border-color: var(--blue); color: #fff;
+    }
+    .tone-hint {
+      font-size: 11px; color: var(--ink-4);
+      margin-bottom: 20px; margin-top: 4px;
     }
 
-    /* SAVE BTN */
+    /* ── SAVE BTN ────────────────────────────────── */
     .btn-save {
-      width: 100%;
-      padding: 15px;
-      background: var(--ink);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      letter-spacing: 0.2px;
+      width: 100%; height: 48px;
+      background: var(--ink); color: #fff;
+      border: none; border-radius: var(--r);
+      font-family: var(--sans);
+      font-weight: 600; font-size: 14px;
+      cursor: pointer; letter-spacing: -.01em;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-save:hover { background: #1a1a25; transform: translateY(-1px); }
+    .btn-save:hover { background: #1a1a25; transform: translateY(-1px); box-shadow: var(--shadow); }
     .btn-save:active { transform: translateY(0); }
+    .btn-save.saving { background: #333; transform: scale(.98); }
+    .btn-save.saved  {
+      background: #16a34a; transform: scale(1.01);
+      box-shadow: 0 4px 20px rgba(22,163,74,.25);
+    }
 
+    /* ── SUCCESS BANNER ──────────────────────────── */
     .save-success {
       display: none;
-      text-align: center;
-      padding: 12px;
+      margin-top: 14px;
       background: #f0fff8;
       border: 1.5px solid #b8ecd6;
       border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #1a7a4a;
-      margin-top: 12px;
+      padding: 12px 14px;
+      font-size: 13px; font-weight: 500;
+      color: #166534;
     }
     .save-success.show { display: block; }
 
-    /* HOW IT WORKS */
-    .section-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--ink);
-      margin-bottom: 16px;
-      letter-spacing: -0.2px;
-    }
-
-    .steps { display: flex; flex-direction: column; gap: 1px; margin-bottom: 40px; }
-    .step {
-      display: flex;
-      gap: 16px;
-      padding: 18px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      transition: background 0.15s;
-    }
-    .step:first-child { border-radius: 12px 12px 0 0; }
-    .step:last-child { border-radius: 0 0 12px 12px; }
-    .step:only-child { border-radius: 12px; }
-    .step:hover { background: #f5f8ff; }
-
-    .step-num {
-      min-width: 28px; height: 28px;
-      background: var(--ink);
-      border-radius: 8px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 13px;
-      color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .step-body h3 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 13px;
-      color: var(--ink); margin-bottom: 3px;
-    }
-    .step-body p { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
-    /* FEATURES */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 40px;
-    }
-    .feature {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      background: #fff;
-      transition: box-shadow 0.2s;
-    }
-    .feature:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-    .feature-icon { font-size: 20px; margin-bottom: 8px; }
-    .feature h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; color: var(--ink); margin-bottom: 4px; }
-    .feature p { font-size: 11px; color: var(--muted); line-height: 1.5; }
-
-    /* CTA */
-    .cta-row {
-      display: flex; gap: 10px; align-items: center;
-    }
-    .btn-linkedin {
-      padding: 13px 28px;
-      background: var(--accent);
-      color: #fff; border: none;
-      border-radius: 12px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 14px;
-      cursor: pointer; text-decoration: none;
-      display: inline-flex; align-items: center; gap: 8px;
-      transition: all 0.2s;
-    }
-    .btn-linkedin:hover { background: #0856a8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,102,194,0.25); }
-    .btn-ghost {
-      padding: 13px 20px;
-      background: transparent;
-      color: var(--muted);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-family: 'Syne', sans-serif;
-      font-weight: 600; font-size: 13px;
-      cursor: pointer; text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-ghost:hover { border-color: #ccc; color: var(--ink); }
-
-    /* FOOTER */
-    footer {
-      margin-top: 60px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 11px; color: #bbb;
-    }
-    footer a { color: #bbb; text-decoration: none; }
-    footer a:hover { color: var(--ink); }
-
-    /* Save button states */
-    .btn-save {
-      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-save.saving {
-      background: #333;
-      transform: scale(0.98);
-    }
-    .btn-save.saved {
-      background: #1a7a4a;
-      transform: scale(1.01);
-      box-shadow: 0 4px 20px rgba(26,122,74,0.25);
-    }
-    @keyframes checkPop {
-      0% { transform: scale(0.5); opacity: 0; }
-      60% { transform: scale(1.15); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .btn-save.saved .check-icon {
-      display: inline-block;
-      animation: checkPop 0.35s ease both;
-    }
-    .save-success {
-      animation: fadeUp 0.4s ease both;
-    }
-
-    /* Login section */
+    /* ── LOGIN SECTION ───────────────────────────── */
     .login-section {
+      display: none;
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid var(--border);
-      display: none;
+      border-top: 1px solid var(--line);
     }
     .login-section.show { display: block; }
     .login-section h3 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 15px;
-      color: var(--ink); margin-bottom: 4px;
+      font-family: var(--display);
+      font-size: 20px; font-weight: 400;
+      letter-spacing: -.4px; color: var(--ink);
+      margin-bottom: 4px;
     }
-    .login-section p {
-      font-size: 12px; color: var(--muted); margin-bottom: 16px;
-    }
-    .login-grid { display: flex; flex-direction: column; gap: 10px; }
-    .login-tabs {
-      display: flex;
-      background: #f0f0f0;
-      border-radius: 8px; padding: 3px; margin-bottom: 4px;
-    }
-    .login-tab {
-      flex: 1; padding: 7px; text-align: center;
-      font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: 0.3px; cursor: pointer; border-radius: 6px;
-      color: var(--muted); transition: all 0.2s;
-    }
-    .login-tab.active { background: var(--ink); color: #fff; }
-    .login-form { display: none; }
-    .login-form.active { display: flex; flex-direction: column; gap: 10px; }
+    .login-section p { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; }
+
     .login-error {
-      background: #fff0f0; border: 1px solid #ffd0d0;
-      border-radius: 8px; padding: 9px 12px;
-      font-size: 12px; color: #c0392b; display: none;
+      background: #fdecef; border: 1px solid #fbd9de;
+      border-radius: 10px; padding: 11px 14px;
+      font-size: 13px; color: #991b1b;
+      margin-bottom: 12px; display: none;
     }
     .login-error.show { display: block; }
-    .btn-login {
-      padding: 13px;
-      background: var(--accent); color: #fff; border: none;
-      border-radius: 10px; font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 13px; cursor: pointer;
-      transition: opacity 0.2s; display: flex;
-      align-items: center; justify-content: center; gap: 8px;
+
+    .btn-linkedin {
+      width: 100%; height: 48px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: var(--r);
+      font-family: var(--sans);
+      font-weight: 600; font-size: 14px;
+      cursor: pointer; letter-spacing: -.01em;
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+      transition: all .18s;
+      box-shadow: 0 1px 3px rgba(10,102,194,.3);
     }
-    .btn-login:hover { opacity: 0.88; }
-    .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-linkedin:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 4px 16px rgba(10,102,194,.35);
+      transform: translateY(-1px);
+    }
+    .btn-linkedin:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
     .logged-in-msg {
+      display: none;
+      align-items: center; gap: 10px;
       background: #f0fff8; border: 1.5px solid #b8ecd6;
-      border-radius: 10px; padding: 12px 14px;
-      font-size: 13px; color: #1a7a4a; font-weight: 500;
-      display: none; align-items: center; gap: 8px;
+      border-radius: 10px; padding: 13px 16px;
+      font-size: 13px; font-weight: 500; color: #166534;
     }
     .logged-in-msg.show { display: flex; }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* ── HOW IT WORKS ────────────────────────────── */
+    .section-title {
+      font-family: var(--display);
+      font-size: 20px; font-weight: 400;
+      letter-spacing: -.4px; color: var(--ink);
+      margin-bottom: 14px;
     }
-    .page > * { animation: fadeUp 0.4s ease both; }
+    .steps { display: flex; flex-direction: column; gap: 2px; margin-bottom: 28px; }
+    .step {
+      display: flex; gap: 14px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      transition: background .15s;
+    }
+    .step:first-child { border-radius: var(--r) var(--r) 0 0; }
+    .step:last-child  { border-radius: 0 0 var(--r) var(--r); }
+    .step:hover { background: #f5f8ff; }
+    .step-num {
+      min-width: 28px; height: 28px;
+      background: var(--blue); border-radius: 8px;
+      font-weight: 700; font-size: 13px; color: #fff;
+      display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .step-body h3 {
+      font-family: var(--sans);
+      font-weight: 600; font-size: 13px;
+      color: var(--ink); margin-bottom: 2px;
+    }
+    .step-body p { font-size: 12px; color: var(--ink-4); line-height: 1.5; }
+
+    /* ── FEATURES ────────────────────────────────── */
+    .feat-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 10px; margin-bottom: 40px;
+    }
+    .feat-card {
+      border: 1px solid var(--line); border-radius: var(--r);
+      padding: 16px; background: var(--surface);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .feat-icon { font-size: 20px; margin-bottom: 8px; }
+    .feat-card h4 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .feat-card p  { font-size: 11px; color: var(--ink-4); line-height: 1.5; }
+
+    /* ── CTA ROW ─────────────────────────────────── */
+    .cta-row { display: flex; gap: 10px; align-items: center; margin-bottom: 48px; }
+    .btn-primary {
+      padding: 12px 24px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: var(--r);
+      font-family: var(--sans); font-weight: 600; font-size: 14px;
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all .18s;
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,102,194,.25); }
+    .btn-ghost {
+      padding: 12px 18px;
+      background: transparent; color: var(--ink-3);
+      border: 1.5px solid var(--line); border-radius: var(--r);
+      font-family: var(--sans); font-weight: 500; font-size: 13px;
+      cursor: pointer; text-decoration: none; transition: all .2s;
+    }
+    .btn-ghost:hover { border-color: var(--line-strong); color: var(--ink); }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--ink-4);
+    }
+    footer a { color: var(--ink-4); text-decoration: none; transition: color .15s; }
+    footer a:hover { color: var(--ink); }
+
+    /* ── ANIMATIONS ──────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page > * { animation: fadeUp .45s ease both; }
     .page > *:nth-child(1) { animation-delay: 0s; }
-    .page > *:nth-child(2) { animation-delay: 0.08s; }
-    .page > *:nth-child(3) { animation-delay: 0.14s; }
-    .page > *:nth-child(4) { animation-delay: 0.20s; }
-    .page > *:nth-child(5) { animation-delay: 0.26s; }
+    .page > *:nth-child(2) { animation-delay: .08s; }
+    .page > *:nth-child(3) { animation-delay: .14s; }
+    .page > *:nth-child(4) { animation-delay: .20s; }
+    .page > *:nth-child(5) { animation-delay: .26s; }
+    .page > *:nth-child(6) { animation-delay: .32s; }
+
+    @media (max-width: 520px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .feat-grid    { grid-template-columns: 1fr 1fr; }
+      nav { padding: 0 20px; }
+    }
   </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="logo">Linked<span>AI</span></div>
-  <div class="topbar-badge">Setup · 2 min</div>
-</div>
+<nav>
+  <div class="logo">Link<b>ora</b></div>
+  <div class="nav-badge">Setup · 2 min</div>
+</nav>
 
 <div class="page">
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-step">Welcome</div>
-    <h1>LinkedIn engagement,<br><em>done right.</em></h1>
-    <p class="hero-sub">Tell us a little about yourself so Linkora can generate comments and messages that truly sound like you.</p>
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Welcome to Linkora
+    </div>
+    <h1>LinkedIn engagement,<br>done <em>right.</em></h1>
+    <p>Tell us a little about yourself so Linkora can generate comments and messages that truly sound like you.</p>
   </div>
 
   <!-- SETUP CARD -->
-  <div class="setup-card">
-    <div class="setup-card-header">
-      <h2>Your Writing Profile</h2>
-      <p>Used to personalize every comment and message we generate for you.</p>
+  <div class="card">
+    <div class="card-header">
+      <h2>Your writing profile</h2>
+      <p>Used to personalise every comment and message we generate for you.</p>
     </div>
-    <div class="setup-card-body">
+    <div class="card-body">
 
       <div class="profile-grid">
         <div class="field">
-          <label>Your Name</label>
+          <label>Your name</label>
           <input type="text" id="userName" placeholder="e.g. Rahul Sharma" />
         </div>
         <div class="field">
-          <label>Your Role / Title</label>
-          <input type="text" id="userRole" placeholder="e.g. SaaS Founder, Growth Lead" />
+          <label>Your role / title</label>
+          <input type="text" id="userRole" placeholder="e.g. SaaS Founder" />
         </div>
         <div class="field full">
           <label>What you do (in your own words)</label>
@@ -473,34 +424,33 @@
         <div class="tone-pill" data-tone="Witty">😄 Witty</div>
         <div class="tone-pill" data-tone="Professional">💼 Professional</div>
       </div>
+      <div class="tone-hint">You can change your tone anytime from extension settings.</div>
 
-      <div style="font-size:11px; color:var(--muted); opacity:0.55; margin-bottom:16px; margin-top:-4px;">
-        You can change your default tone anytime from the extension settings.
-      </div>
+      <button class="btn-save" id="saveBtn">Save profile & get started →</button>
 
-      <button class="btn-save" id="saveBtn">Save Profile & Get Started →</button>
       <div class="save-success" id="saveSuccess">
-        ✓ Profile saved! Now create your account below to start using Linkora.
+        ✓ Profile saved! Now connect your LinkedIn account below.
       </div>
 
-      <!-- LinkedIn sign-in after profile save -->
+      <!-- LinkedIn sign-in -->
       <div class="login-section" id="loginSection">
-        <h3>Sign in to activate Linkora</h3>
-        <p>Connect your LinkedIn account to start generating comments, messages and replies.</p>
+        <h3>Activate your account</h3>
+        <p>Sign in with LinkedIn to start generating comments, messages and replies.</p>
 
         <div class="login-error" id="loginError"></div>
 
-        <button class="btn-login" id="ob-linkedinBtn" style="background:var(--accent);display:flex;align-items:center;justify-content:center;gap:10px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <button class="btn-linkedin" id="ob-linkedinBtn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
           </svg>
-          <span>Continue with LinkedIn →</span>
+          Continue with LinkedIn →
         </button>
 
         <div class="logged-in-msg" id="loggedInMsg">
           ✓ You're signed in! Click the Linkora icon in your Chrome toolbar to start.
         </div>
       </div>
+
     </div>
   </div>
 
@@ -510,69 +460,69 @@
     <div class="step">
       <div class="step-num">1</div>
       <div class="step-body">
-        <h3>Sign up in the extension</h3>
-        <p>Click the Linkora icon in Chrome → create a free account with your email.</p>
+        <h3>Save your profile</h3>
+        <p>Fill in your name, role and bio above — this shapes every generation.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-body">
-        <h3>Paste a post or describe who you're messaging</h3>
-        <p>For comments: paste the LinkedIn post. For DMs: describe the person and your reason for reaching out.</p>
+        <h3>Sign in with LinkedIn</h3>
+        <p>Authenticate once — no separate password, just OAuth. Free account activated instantly.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-body">
-        <h3>Get 3 options, pick the best one</h3>
-        <p>Review, copy, and paste into LinkedIn. Or use the inline ✦ AI button that appears inside comment boxes.</p>
+        <h3>Generate & copy</h3>
+        <p>Open the extension, paste a post, pick a tone, get 3 options. Or use the inline ✦ AI button on LinkedIn.</p>
       </div>
     </div>
   </div>
 
   <!-- FEATURES -->
-  <div class="features-grid">
-    <div class="feature">
-      <div class="feature-icon">💬</div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">💬</div>
       <h4>Comment Generator</h4>
       <p>3 tone-matched options. Sounds human, not robotic.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">✉️</div>
+    <div class="feat-card">
+      <div class="feat-icon">✉️</div>
       <h4>DM Drafter</h4>
       <p>Personalized outreach that gets replies.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">✦</div>
+    <div class="feat-card">
+      <div class="feat-icon">✦</div>
       <h4>Inline Button</h4>
       <p>One click inside any LinkedIn comment box.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
       <h4>Private</h4>
-      <p>No data stored. API calls go direct.</p>
+      <p>Content is processed and never stored.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">⚡</div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
       <h4>Fast</h4>
       <p>Results in under 3 seconds.</p>
     </div>
-    <div class="feature">
-      <div class="feature-icon">🎯</div>
+    <div class="feat-card">
+      <div class="feat-icon">🎯</div>
       <h4>Your Voice</h4>
-      <p>Adapts to your tone and style.</p>
+      <p>Adapts to your tone and writing style.</p>
     </div>
   </div>
 
   <!-- CTA -->
   <div class="cta-row">
-    <a href="https://www.linkedin.com" class="btn-linkedin" target="_blank">Open LinkedIn →</a>
+    <a href="https://www.linkedin.com" class="btn-primary" target="_blank">Open LinkedIn →</a>
     <a href="privacy.html" class="btn-ghost" target="_blank">Privacy Policy</a>
   </div>
 
   <footer>
     <span>Linkora · v3.0.0 · Chrome Extension</span>
-    <span><a href="privacy.html">Privacy</a> · Powered by Makerman-Lab</span>
+    <span><a href="privacy.html">Privacy</a> · Powered by Makermanlabs</span>
   </footer>
 
 </div>

@@ -1,17 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "LinkedAI \u2013 Smart LinkedIn Assistant",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtz56Nr6Jq5EqLnsDcElZrWrjyy6vJAZrGoEtM+vCjm0Z3CLbOxAtlbyeqGnQgpcxMAqPc+A3gC+OyRCyTCU6JW6RGcTTjfE5te9ps5u4qtQ4KY0j8dcem704Xl63i6V3N1buPV8rky3HWQGWgrvJP6fYtDZ3a98KD0si33uu3A3s4ZIT8fGItw7bVrXDRI1VqPHY+ThcvgQyneoAeOeb3O4U/NOwsL4w9aPttjimpPeFphPEdxtzD6ajuyNMyBAR/MZByh9JLIrM6wx7Uxsjq+qsdSUZygil4hNK4a/gcazH+9J+Wu676Wi5TbxmcgxD05isFeWRLnreFKb1MF8lCQIDAQAB",
-  "version": "3.0.0",
+  "name": "Linkora \u2013 Smart LinkedIn Assistant",
+  "version": "4.0.0",
   "description": "AI-powered LinkedIn comment & message drafter. Sign in with LinkedIn and start generating instantly.",
   "permissions": [
-    "activeTab",
     "storage",
     "identity"
   ],
   "host_permissions": [
     "https://www.linkedin.com/*",
-    "https://linkedai-backend-three.vercel.app/*"
+    "https://linkedai-backend-kappa.vercel.app/*"
   ],
   "action": {
     "default_popup": "popup.html",

@@ -1,5 +1,5 @@
 const LINKEDIN_CLIENT_ID = '86dn20hkn05b0o';
-const BACKEND_URL = 'https://linkedai-backend-three.vercel.app';
+const BACKEND_URL = 'https://linkedai-backend-kappa.vercel.app';
 
 let selectedTone = 'Thoughtful';
 

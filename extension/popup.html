@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LinkedAI</title>
+  <title>Linkora</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
   <!-- ── AUTH SCREEN ────────────────────────────────────────────── -->
   <div class="screen auth-screen active" id="authScreen">
     <div class="auth-header">
-      <div class="auth-logo">Linked<span>AI</span></div>
+      <div class="auth-logo">Link<b>ora</b></div>
       <div class="auth-tagline">LinkedIn AI Assistant</div>
     </div>
     <div class="auth-body">
@@ -45,7 +45,7 @@
   <!-- ── MAIN APP SCREEN ────────────────────────────────────────── -->
   <div class="screen app-screen" id="appScreen">
     <div class="app-header">
-      <div class="app-logo">Linked<span>AI</span></div>
+      <div class="app-logo">Link<b>ora</b></div>
       <div class="header-right">
         <div class="usage-badge" id="usageBadge">— / —</div>
         <button class="icon-btn" id="profileBtn" title="Account">
@@ -167,7 +167,15 @@
 
         <!-- User info -->
         <div class="profile-section">
-          <div class="profile-avatar" id="profileAvatar">?</div>
+          <div class="profile-top-row">
+            <div class="profile-avatar" id="profileAvatar">?</div>
+            <button class="profile-gear-btn" id="openSettings" title="Edit Writing Profile">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+          </div>
           <div class="profile-name" id="profileName">—</div>
           <div class="profile-email" id="profileEmail">—</div>
           <div class="profile-status">
@@ -181,6 +189,17 @@
             </div>
             <div class="usage-bar">
               <div class="usage-bar-fill" id="usageBarFill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription management (shown for paid plans) -->
+        <div id="subManageSection" style="display:none">
+          <div class="sub-manage-card">
+            <div class="sub-manage-label">Subscription</div>
+            <div class="sub-manage-actions">
+              <button class="btn-sub-action" id="btnDowngrade">Downgrade to Free</button>
+              <button class="btn-sub-action danger" id="btnCancel">Cancel Renewal</button>
             </div>
           </div>
         </div>
@@ -201,6 +220,78 @@
         <button class="btn-signout" id="signOutBtn">Sign Out</button>
       </div>
 
+    </div>
+
+    <!-- ── SETTINGS OVERLAY (slides in over full app) ──────────── -->
+    <div class="settings-overlay" id="settingsOverlay">
+
+      <div class="settings-header">
+        <button class="settings-back-btn" id="settingsClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="settings-title">Writing Profile</div>
+        <div class="settings-header-spacer"></div>
+      </div>
+
+      <div class="settings-body">
+        <p class="settings-desc">Linkora uses this to personalise every generation in your voice — not a generic AI voice.</p>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Your identity</div>
+          <div class="form-row">
+            <label>Your name</label>
+            <input type="text" class="app-input" id="settingsName" placeholder="e.g. Rahul Sharma" />
+          </div>
+          <div class="form-row">
+            <label>Your role / title</label>
+            <input type="text" class="app-input" id="settingsRole" placeholder="e.g. SaaS Founder" />
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">About you <span class="optional-tag">in your own words</span></div>
+          <textarea id="settingsBio" rows="4" placeholder="e.g. I build B2B tools for sales teams. I post about growth, outbound, and founder lessons. I want my LinkedIn presence to be thoughtful and direct — not salesy."></textarea>
+          <div class="settings-hint">The more specific you are, the more personalised your outputs will be.</div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">Default tone</div>
+          <div class="tone-row" id="settingsTones">
+            <div class="tone-pill" data-tone="Thoughtful">🧠 Thoughtful</div>
+            <div class="tone-pill" data-tone="Direct">⚡ Direct</div>
+            <div class="tone-pill" data-tone="Warm">😊 Warm</div>
+            <div class="tone-pill" data-tone="Witty">😄 Witty</div>
+            <div class="tone-pill" data-tone="Professional">💼 Professional</div>
+          </div>
+          <div class="settings-hint">Can be overridden per-generation in the Comment, Outreach, and Reply tabs.</div>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <div class="settings-save-feedback" id="settingsSaveMsg"></div>
+        <div class="settings-actions">
+          <button class="btn-settings-cancel" id="settingsCancel">Cancel</button>
+          <button class="btn-settings-save" id="settingsSave">Save changes</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── CONFIRMATION MODAL ─────────────────────────────────── -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-icon-wrap" id="modalIconWrap">
+        <svg id="modalIconSvg" viewBox="0 0 24 24"></svg>
+      </div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-consequences" id="modalConsequences"></div>
+      <div class="modal-actions">
+        <button class="modal-btn-ghost" id="modalBtnCancel">Keep plan</button>
+        <button class="modal-btn-primary" id="modalBtnConfirm"></button>
+      </div>
     </div>
   </div>
 
