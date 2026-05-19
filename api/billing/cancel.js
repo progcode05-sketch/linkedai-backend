@@ -1,11 +1,7 @@
-const Razorpay = require('razorpay');
 const { setCors, verifyToken, supabase } = require('../_lib');
 
-const rzp = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
-
+// Cashfree doesn't have recurring subscriptions in this integration —
+// cancellation is handled by clearing the user's plan in Supabase.
 module.exports = async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -18,24 +14,20 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: err.message });
   }
 
-  if (!user.razorpay_subscription_id) {
-    return res.status(400).json({ error: 'No active subscription found' });
+  if (!user.subscription_status || user.subscription_status === 'free') {
+    return res.status(400).json({ error: 'No active subscription to cancel.' });
   }
 
   try {
-    // Cancel at period end (cancel_at_cycle_end = true)
-    await rzp.subscriptions.cancel(user.razorpay_subscription_id, true);
-
-    // Immediately revert to free in our DB
     await supabase
       .from('users')
       .update({
-        subscription_status: 'free',
+        subscription_status:      'free',
         razorpay_subscription_id: null
       })
       .eq('id', user.id);
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, status: 'cancelled' });
 
   } catch (err) {
     console.error('Cancel error:', err);

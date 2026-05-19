@@ -11,6 +11,6 @@
     "@supabase/supabase-js": "^2.45.0",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
-    "razorpay": "^2.9.2"
+    "cashfree-pg": "^4.0.0"
   }
 }

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { supabase } = require('../_lib');
 
-// Disable body parser so we get the raw body for signature verification
+// Raw body required for signature verification
 module.exports.config = {
   api: { bodyParser: false }
 };
@@ -17,21 +17,22 @@ async function getRawBody(req) {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const rawBody = await getRawBody(req);
-  const signature = req.headers['x-razorpay-signature'];
+  const rawBody  = await getRawBody(req);
+  const timestamp = req.headers['x-webhook-timestamp'];
+  const signature = req.headers['x-webhook-signature'];
 
-  // Verify webhook signature
+  // ── Cashfree signature: HMAC-SHA256(timestamp + rawBody) → base64 ──
+  const signedPayload = timestamp + rawBody;
   const expected = crypto
-    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
-    .update(rawBody)
-    .digest('hex');
+    .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
+    .update(signedPayload)
+    .digest('base64');  // base64, NOT hex (different from Razorpay)
 
   if (expected !== signature) {
-    console.error('Webhook signature mismatch');
+    console.error('Cashfree webhook signature mismatch');
     return res.status(400).json({ error: 'Invalid signature' });
   }
 
@@ -42,50 +43,42 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON' });
   }
 
-  const eventType = event.event;
-  const subscriptionEntity = event.payload?.subscription?.entity;
-
-  if (!subscriptionEntity) return res.status(200).json({ received: true });
-
-  const subscriptionId = subscriptionEntity.id;
-  const notes = subscriptionEntity.notes || {};
-  const plan = notes.plan; // 'pro' or 'max'
+  const { type, data } = event;
 
   try {
-    if (eventType === 'subscription.activated' || eventType === 'subscription.charged') {
-      // Payment succeeded — activate the plan
-      if (plan && ['pro', 'max'].includes(plan)) {
+    if (type === 'PAYMENT_SUCCESS_WEBHOOK') {
+      const orderId = data?.order?.order_id;
+      const plan    = data?.order?.order_tags?.plan;
+
+      if (orderId && plan && ['pro', 'max'].includes(plan)) {
         await supabase
           .from('users')
           .update({ subscription_status: plan })
-          .eq('razorpay_subscription_id', subscriptionId);
+          .eq('razorpay_subscription_id', orderId);  // column reused for order_id
       }
 
-    } else if (
-      eventType === 'subscription.cancelled' ||
-      eventType === 'subscription.halted' ||
-      eventType === 'subscription.completed'
-    ) {
-      // Subscription ended — revert to free
-      await supabase
-        .from('users')
-        .update({
-          subscription_status: 'free',
-          razorpay_subscription_id: null
-        })
-        .eq('razorpay_subscription_id', subscriptionId);
+    } else if (type === 'PAYMENT_FAILED_WEBHOOK') {
+      const orderId = data?.order?.order_id;
+      if (orderId) {
+        // Clear pending order so user can retry
+        await supabase
+          .from('users')
+          .update({ razorpay_subscription_id: null })
+          .eq('razorpay_subscription_id', orderId);
+      }
 
-    } else if (eventType === 'payment.failed') {
-      // Check if it's a subscription payment failure
-      const paymentEntity = event.payload?.payment?.entity;
-      if (paymentEntity?.description?.includes('subscription')) {
+    } else if (type === 'REFUND_STATUS_WEBHOOK') {
+      // Refund confirmed — revert plan to free
+      const orderId = data?.refund?.order_id;
+      if (orderId) {
         await supabase
           .from('users')
           .update({ subscription_status: 'free', razorpay_subscription_id: null })
-          .eq('razorpay_subscription_id', paymentEntity.subscription_id);
+          .eq('razorpay_subscription_id', orderId);
       }
     }
 
+    // Always return 200 — Cashfree will retry on non-200
     return res.status(200).json({ received: true });
 
   } catch (err) {
