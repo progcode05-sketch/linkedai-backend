@@ -1,7 +1,18 @@
 const { setCors, verifyToken, supabase } = require('../_lib');
 
-// Cashfree doesn't have recurring subscriptions in this integration —
-// cancellation is handled by clearing the user's plan in Supabase.
+const CASHFREE_BASE = process.env.CASHFREE_ENV === 'production'
+  ? 'https://api.cashfree.com/pg'
+  : 'https://sandbox.cashfree.com/pg';
+
+function cfHeaders() {
+  return {
+    'x-api-version':   '2025-01-01',
+    'x-client-id':     process.env.CASHFREE_APP_ID,
+    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+    'Content-Type':    'application/json'
+  };
+}
+
 module.exports = async function handler(req, res) {
   setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -18,7 +29,24 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No active subscription to cancel.' });
   }
 
+  const subscriptionId = user.razorpay_subscription_id;
+
   try {
+    // Cancel on Cashfree if subscription ID exists
+    if (subscriptionId) {
+      const cfRes = await fetch(
+        `${CASHFREE_BASE}/subscriptions/${subscriptionId}/cancel`,
+        { method: 'POST', headers: cfHeaders() }
+      );
+
+      if (!cfRes.ok) {
+        const cfData = await cfRes.json().catch(() => ({}));
+        // Log but don't block — still revoke access in DB below
+        console.error('Cashfree cancel failed:', cfData.message);
+      }
+    }
+
+    // Revoke plan in Supabase regardless of Cashfree response
     await supabase
       .from('users')
       .update({

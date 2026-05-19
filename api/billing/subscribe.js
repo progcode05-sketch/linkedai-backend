@@ -4,7 +4,10 @@ const CASHFREE_BASE = process.env.CASHFREE_ENV === 'production'
   ? 'https://api.cashfree.com/pg'
   : 'https://sandbox.cashfree.com/pg';
 
-const PLAN_AMOUNTS = { pro: 9.00, max: 20.00 };
+const PLAN_IDS = {
+  pro: process.env.CASHFREE_PLAN_PRO,
+  max: process.env.CASHFREE_PLAN_MAX
+};
 
 function cfHeaders() {
   return {
@@ -32,52 +35,57 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid plan. Must be "pro" or "max".' });
   }
 
-  // Unique order ID — embed plan + user so webhook can recover context
-  const orderId = `lnk_${plan}_${user.id}_${Date.now()}`;
+  const planId = PLAN_IDS[plan];
+  if (!planId) {
+    return res.status(500).json({ error: 'Plan not configured on server.' });
+  }
+
+  // Unique subscription ID — embed plan + user so webhook can recover context
+  const subscriptionId = `lnk_${plan}_${user.id}_${Date.now()}`;
 
   try {
-    const cfRes = await fetch(`${CASHFREE_BASE}/orders`, {
+    const cfRes = await fetch(`${CASHFREE_BASE}/subscriptions`, {
       method: 'POST',
       headers: cfHeaders(),
       body: JSON.stringify({
-        order_id:       orderId,
-        order_amount:   PLAN_AMOUNTS[plan],  // float INR, NOT paise
-        order_currency: 'INR',
+        subscription_id:      subscriptionId,
+        plan_id:              planId,
+        authorization_amount: 0,  // ₹0 auth — no charge during mandate setup
         customer_details: {
           customer_id:    user.id,
-          customer_phone: user.phone || '9999999999', // Cashfree requires phone
+          customer_phone: user.phone || '9999999999',
           customer_name:  user.name  || '',
           customer_email: user.email || ''
         },
-        order_meta: {
-          return_url:  `${process.env.APP_URL}/pay.html?order_id=${orderId}&plan=${plan}`,
+        subscription_meta: {
+          // {subscription_id} is replaced by Cashfree automatically
+          return_url:  `${process.env.APP_URL}/pay.html?sub_id={subscription_id}&plan=${plan}`,
           notify_url:  `${process.env.APP_URL}/api/billing/webhook`
         },
-        order_tags: {
+        subscription_tags: {
           plan,
-          user_id: user.id   // webhook uses this to find the user
+          user_id: user.id  // webhook uses this to find the user
         }
       })
     });
 
     const cfData = await cfRes.json();
-    if (!cfRes.ok) throw new Error(cfData.message || 'Cashfree order creation failed');
+    if (!cfRes.ok) throw new Error(cfData.message || 'Failed to create subscription');
 
-    // Store pending order_id so webhook can locate this user
+    // Store pending subscription ID so webhook can locate this user
     await supabase
       .from('users')
-      .update({ razorpay_subscription_id: orderId })
+      .update({ razorpay_subscription_id: subscriptionId })
       .eq('id', user.id);
 
     return res.status(200).json({
-      order_id:          cfData.order_id,
-      payment_session_id: cfData.payment_session_id,  // frontend passes this to Cashfree.checkout()
-      key_id:            process.env.CASHFREE_APP_ID, // kept for backward-compat with pay.html
+      subscription_id:    cfData.subscription_id,
+      payment_session_id: cfData.payment_session_id,  // frontend passes to Cashfree.checkout()
       plan
     });
 
   } catch (err) {
     console.error('Subscribe error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to create order' });
+    return res.status(500).json({ error: err.message || 'Failed to create subscription' });
   }
 };

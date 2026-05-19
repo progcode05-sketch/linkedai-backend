@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { supabase } = require('../_lib');
 
-// Raw body required for signature verification
+// Raw body required for Cashfree signature verification
 module.exports.config = {
   api: { bodyParser: false }
 };
@@ -20,16 +20,16 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  const rawBody  = await getRawBody(req);
+  const rawBody   = await getRawBody(req);
   const timestamp = req.headers['x-webhook-timestamp'];
   const signature = req.headers['x-webhook-signature'];
 
-  // ── Cashfree signature: HMAC-SHA256(timestamp + rawBody) → base64 ──
+  // ── Cashfree signature: HMAC-SHA256(timestamp + rawBody) → base64 ──────────
   const signedPayload = timestamp + rawBody;
   const expected = crypto
     .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
     .update(signedPayload)
-    .digest('base64');  // base64, NOT hex (different from Razorpay)
+    .digest('base64');  // base64, NOT hex
 
   if (expected !== signature) {
     console.error('Cashfree webhook signature mismatch');
@@ -45,40 +45,70 @@ module.exports = async function handler(req, res) {
 
   const { type, data } = event;
 
+  // ── Helper: get subscription ID from event data ────────────────────────────
+  const getSubId = () =>
+    data?.subscription?.subscription_id ||
+    data?.subscription_id ||
+    data?.order?.order_id;
+
+  // ── Helper: get plan from subscription tags ────────────────────────────────
+  const getPlan = () =>
+    data?.subscription?.subscription_tags?.plan ||
+    data?.subscription_tags?.plan;
+
   try {
-    if (type === 'PAYMENT_SUCCESS_WEBHOOK') {
-      const orderId = data?.order?.order_id;
-      const plan    = data?.order?.order_tags?.plan;
+    switch (type) {
 
-      if (orderId && plan && ['pro', 'max'].includes(plan)) {
-        await supabase
-          .from('users')
-          .update({ subscription_status: plan })
-          .eq('razorpay_subscription_id', orderId);  // column reused for order_id
+      // ── Mandate authorized + first payment done → activate plan ────────────
+      case 'SUBSCRIPTION_ACTIVATED':
+      case 'SUBSCRIPTION_PAYMENT_SUCCESS':
+      case 'subscription.activated':
+      case 'subscription.payment_success': {
+        const subId = getSubId();
+        const plan  = getPlan();
+        if (subId && plan && ['pro', 'max'].includes(plan)) {
+          await supabase
+            .from('users')
+            .update({ subscription_status: plan })
+            .eq('razorpay_subscription_id', subId);
+        }
+        break;
       }
 
-    } else if (type === 'PAYMENT_FAILED_WEBHOOK') {
-      const orderId = data?.order?.order_id;
-      if (orderId) {
-        // Clear pending order so user can retry
-        await supabase
-          .from('users')
-          .update({ razorpay_subscription_id: null })
-          .eq('razorpay_subscription_id', orderId);
+      // ── Subscription cancelled / failed / completed → revert to free ───────
+      case 'SUBSCRIPTION_CANCELLED':
+      case 'SUBSCRIPTION_PAYMENT_FAILED':
+      case 'SUBSCRIPTION_COMPLETED':
+      case 'subscription.cancelled':
+      case 'subscription.payment_failed':
+      case 'subscription.completed': {
+        const subId = getSubId();
+        if (subId) {
+          await supabase
+            .from('users')
+            .update({
+              subscription_status:      'free',
+              razorpay_subscription_id: null
+            })
+            .eq('razorpay_subscription_id', subId);
+        }
+        break;
       }
 
-    } else if (type === 'REFUND_STATUS_WEBHOOK') {
-      // Refund confirmed — revert plan to free
-      const orderId = data?.refund?.order_id;
-      if (orderId) {
-        await supabase
-          .from('users')
-          .update({ subscription_status: 'free', razorpay_subscription_id: null })
-          .eq('razorpay_subscription_id', orderId);
-      }
+      // ── New subscription created / authorized — no plan change yet ─────────
+      case 'SUBSCRIPTION_NEW':
+      case 'SUBSCRIPTION_AUTHORIZED':
+      case 'subscription.new':
+      case 'subscription.authorized':
+        // Handled by verify.js when user returns to pay.html
+        break;
+
+      default:
+        // Unknown event — log and ignore
+        console.log('Unhandled Cashfree webhook event:', type);
     }
 
-    // Always return 200 — Cashfree will retry on non-200
+    // Always return 200 — Cashfree retries on non-200
     return res.status(200).json({ received: true });
 
   } catch (err) {

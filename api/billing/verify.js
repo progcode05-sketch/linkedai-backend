@@ -24,28 +24,30 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: err.message });
   }
 
-  const { order_id } = req.body || {};
-  if (!order_id) return res.status(400).json({ error: 'Missing order_id' });
+  const { subscription_id } = req.body || {};
+  if (!subscription_id) return res.status(400).json({ error: 'Missing subscription_id' });
 
   try {
-    // Fetch order from Cashfree to confirm PAID status
-    const cfRes = await fetch(`${CASHFREE_BASE}/orders/${order_id}`, {
+    // Fetch subscription from Cashfree to confirm active status
+    const cfRes = await fetch(`${CASHFREE_BASE}/subscriptions/${subscription_id}`, {
       headers: cfHeaders()
     });
 
-    const order = await cfRes.json();
-    if (!cfRes.ok) throw new Error(order.message || 'Failed to fetch order from Cashfree');
+    const sub = await cfRes.json();
+    if (!cfRes.ok) throw new Error(sub.message || 'Failed to fetch subscription');
 
-    if (order.order_status !== 'PAID') {
+    // ACTIVE = mandate authorized and first charge done
+    // ON_HOLD = mandate authorized, charge pending (also treat as active)
+    const activeStatuses = ['ACTIVE', 'ON_HOLD'];
+    if (!activeStatuses.includes(sub.status)) {
       return res.status(400).json({
-        error: `Payment not complete. Status: ${order.order_status}`
+        error: `Subscription not active. Status: ${sub.status}`
       });
     }
 
-    // Plan is stored in order_tags when order was created
-    const plan = order.order_tags?.plan;
+    const plan = sub.subscription_tags?.plan;
     if (!plan || !['pro', 'max'].includes(plan)) {
-      return res.status(400).json({ error: 'Could not determine plan from order' });
+      return res.status(400).json({ error: 'Could not determine plan from subscription' });
     }
 
     // Activate plan in Supabase
